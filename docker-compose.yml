@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  dev-db:
+    image: postgres:14
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: vision_car_server
+  redis:
+    image: redis:7
+    ports:
+      - 6379:6379
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081
