@@ -7,6 +7,7 @@ import {
   Session,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { PublicRoute } from './decorator';
 import { AuthDto } from './dto';
 import { AuthRoute } from './enums';
 import { UserSession, UserSessionData } from './types';
@@ -15,6 +16,7 @@ import { UserSession, UserSessionData } from './types';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @PublicRoute()
   @Post(AuthRoute.register)
   async register(@Body() authDto: AuthDto, @Session() session: UserSession) {
     const userSessionData = await this.authService.register(authDto);
@@ -22,14 +24,22 @@ export class AuthController {
     this.serializeSession(session, userSessionData);
   }
 
+  @PublicRoute()
   @Post(AuthRoute.login)
   @HttpCode(HttpStatus.OK)
   async login(@Body() authDto: AuthDto, @Session() session: UserSession) {
     const userSessionData = await this.authService.login(authDto);
 
+    this.serializeSession(session, userSessionData);
+  }
+
+  @Post(AuthRoute.logout)
+  async logout(@Session() session: UserSession) {
     console.log({ session });
 
-    this.serializeSession(session, userSessionData);
+    session.destroy((err) => {
+      if (err) throw err;
+    });
   }
 
   private serializeSession(
