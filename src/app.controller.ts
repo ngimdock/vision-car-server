@@ -4,7 +4,7 @@ import { PublicRoute } from './auth/decorator';
 
 @Controller()
 export class AppController {
-  // @PublicRoute()
+  @PublicRoute()
   @Get('status')
   getStatus() {
     return {

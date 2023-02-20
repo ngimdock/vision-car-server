@@ -34,9 +34,8 @@ export class AuthController {
   }
 
   @Post(AuthRoute.logout)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Session() session: UserSession) {
-    console.log({ session });
-
     session.destroy((err) => {
       if (err) throw err;
     });
