@@ -9,6 +9,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: vision_car_server
+  test-db:
+    image: postgres:14
+    ports:
+      - '5434:5434'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: vision_car_server
   redis:
     image: redis:7
     ports:

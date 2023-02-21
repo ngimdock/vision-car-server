@@ -32,7 +32,9 @@ export class RoleGuard implements CanActivate {
     const currentUserGetRole = roles.includes(session.user.role);
 
     if (!currentUserGetRole)
-      throw new UnauthorizedException('Reserved for admins only.');
+      throw new UnauthorizedException(
+        "You don't have permission to access this resource",
+      );
 
     return true;
   }
