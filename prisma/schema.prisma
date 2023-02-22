@@ -8,27 +8,26 @@ datasource db {
 }
 
 model User {
-  id    String    @id @default(uuid())
-  email String @unique
+  id       String  @id @default(uuid())
+  email    String  @unique
   username String? @unique
-  name String?
-  avatar String?
-  hash  String
+  name     String?
+  avatar   String?
+  hash     String
 
   role Role @default(CUSTOMER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
   creditCards CreditCard[]
 
-  bookedCars Car[] @relation("BookedCars")
-  likedCars Car[] @relation("LikedCars")
+  bookedCars    Car[] @relation("BookedCars")
+  likedCars     Car[] @relation("LikedCars")
   publishedCars Car[] @relation("PublishedCars")
 
   contryId String?
-  contry Contry? @relation(fields: [contryId], references: [id])
+  contry   Contry? @relation(fields: [contryId], references: [id])
 }
 
 model Contry {
@@ -36,38 +35,38 @@ model Contry {
 
   name String
   code String
-  tax Int
+  tax  Int
 
   users User[]
 }
 
 model CreditCard {
-  id String @id @default(uuid())
+  id     String @id @default(uuid())
   number String
-  name String
-  cvc String
+  name   String
+  cvc    String
   expiry String
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Car {
-  id String @id @default(uuid())
-  brand String
-  description String
-  images String[]
-  price Int
+  id               String   @id @default(uuid())
+  brand            String
+  description      String
+  images           String[]
+  price            Int
   reductionPercent Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   usersWhoBooked User[] @relation("BookedCars")
-  usersWhoLiked User[] @relation("LikedCars")
+  usersWhoLiked  User[] @relation("LikedCars")
 
   publisherId String
-  publisher User @relation("PublishedCars", fields: [publisherId], references: [id])
+  publisher   User   @relation("PublishedCars", fields: [publisherId], references: [id])
 }
 
 enum Role {

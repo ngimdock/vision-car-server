@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { RoleGuard, SessionGuard } from './auth/guard';
 import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -28,6 +29,7 @@ import * as redisStore from 'cache-manager-redis-store';
     }),
     AuthModule,
     PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [

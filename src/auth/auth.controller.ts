@@ -47,4 +47,22 @@ export class AuthController {
   ) {
     session.user = { ...userSessionData };
   }
+
+  /**@TODO */
+  @Post(AuthRoute.confirmEmail)
+  async confirmEmail() {
+    return { message: 'Email confirmed' };
+  }
+
+  /**@TODO */
+  @Post(AuthRoute.changeEmail)
+  async changeEmail() {
+    return { message: 'Email changed' };
+  }
+
+  /**@TODO */
+  @Post(AuthRoute.resetPassword)
+  async resetPassword() {
+    return { message: 'Password reset' };
+  }
 }
