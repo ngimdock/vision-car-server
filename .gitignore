@@ -395,4 +395,5 @@ Temporary Items
 =======
 # Local
 .env
+.env.test
 dist

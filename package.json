@@ -16,7 +16,7 @@
     "db:dev:restart": "yarn db:dev:stop && yarn db:dev:start",
     "prisma:dev:deploy": "npx prisma migrate deploy",
     "prisma:dev:studio": "npx prisma studio",
-    "db:test:start": "docker compose up test-db -d",
+    "db:test:start": "docker compose up test-db -d && sleep 1 && yarn prisma:test:deploy",
     "db:test:stop": "docker compose rm test-db -s -f -v",
     "db:test:restart": "yarn db:test:stop && yarn db:test:start",
     "prisma:test:deploy": "dotenv -e .env.test -- npx prisma migrate deploy",
@@ -31,8 +31,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "pretest:e2e": "yarn db:test:restart",
-    "test:e2e": "dotenv -e .env.test -- jest --watch --no-cache --config ./test/jest-e2e.json"
+    "test:e2e": "dotenv -e .env.test -- jest --no-cache --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -49,6 +48,7 @@
     "dotenv": "^16.0.3",
     "express-session": "^1.17.3",
     "global": "^4.4.0",
+    "pactum": "^3.3.2",
     "redis": "^4.6.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
