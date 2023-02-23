@@ -3,7 +3,7 @@ import { CredentialsIncorrectException } from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
-import { UserSessionData } from './types';
+import { UserSession, UserSessionData } from './types';
 
 @Injectable()
 export class AuthService {
@@ -52,5 +52,11 @@ export class AuthService {
     } catch (err) {
       throw err;
     }
+  }
+
+  destroySession(session: UserSession) {
+    session.destroy((err) => {
+      if (err) throw err;
+    });
   }
 }

@@ -67,8 +67,8 @@ model Car {
   usersWhoBooked User[] @relation("BookedCars")
   usersWhoLiked  User[] @relation("LikedCars")
 
-  publisherId String
-  publisher   User   @relation("PublishedCars", fields: [publisherId], references: [id])
+  publisherId String?
+  publisher   User?   @relation("PublishedCars", fields: [publisherId], references: [id], onDelete: SetNull) 
 }
 
 enum Role {

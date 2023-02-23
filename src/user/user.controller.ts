@@ -7,9 +7,12 @@ import {
   HttpStatus,
   Param,
   Patch,
+  Session,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { AuthService } from 'src/auth/auth.service';
 import { GetUserId, Roles } from 'src/auth/decorator';
+import { UserSession } from 'src/auth/types';
 import { UpdateUserDto } from './dto';
 import { UserRoutes } from './enums';
 import { UserService } from './user.service';
@@ -18,7 +21,10 @@ import { UserService } from './user.service';
 export class UserController {
   private static readonly userId = 'userId';
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Get(UserRoutes.me)
   findMe(@GetUserId() userId: string) {
@@ -32,8 +38,13 @@ export class UserController {
 
   @Delete(UserRoutes.delete)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@GetUserId() userId: string) {
-    return await this.userService.deleteUser(userId);
+  async deleteUser(
+    @GetUserId() userId: string,
+    @Session() session: UserSession,
+  ) {
+    await this.userService.deleteUser(userId);
+
+    this.authService.destroySession(session);
   }
 
   @Roles(Role.ADMIN)

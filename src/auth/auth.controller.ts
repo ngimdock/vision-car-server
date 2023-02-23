@@ -36,9 +36,7 @@ export class AuthController {
   @Post(AuthRoute.logout)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Session() session: UserSession) {
-    session.destroy((err) => {
-      if (err) throw err;
-    });
+    this.authService.destroySession(session);
   }
 
   private serializeSession(
