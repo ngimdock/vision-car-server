@@ -5,6 +5,10 @@ import * as session from 'express-session';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
 import * as connectRedis from 'connect-redis';
+import {
+  TimeoutInterceptor,
+  WrapResponseInterceptor,
+} from './common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,6 +41,11 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
     }),
+  );
+
+  app.useGlobalInterceptors(
+    new WrapResponseInterceptor(),
+    new TimeoutInterceptor(),
   );
 
   await redisClient
