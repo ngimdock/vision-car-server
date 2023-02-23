@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCarDto } from './dto';
+import { CarNotFoundException } from './exceptions';
 
 @Injectable()
 export class CarService {
@@ -43,5 +44,26 @@ export class CarService {
     } catch (e) {
       throw new CustomHttpExeption();
     }
+  }
+
+  async findOneById(cardId: string) {
+    const car = await this.prisma.car.findUnique({
+      where: {
+        id: cardId,
+      },
+
+      include: {
+        _count: {
+          select: {
+            usersWhoBooked: true,
+            usersWhoLiked: true,
+          },
+        },
+      },
+    });
+
+    if (!car) throw new CarNotFoundException();
+
+    return car;
   }
 }

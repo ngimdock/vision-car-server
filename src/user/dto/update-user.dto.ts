@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsLowercase, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
   @MinLength(4)
+  @IsLowercase()
   username?: string;
 
   @IsString()

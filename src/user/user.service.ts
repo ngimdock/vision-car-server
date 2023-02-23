@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
@@ -20,7 +20,12 @@ export class UserService {
   async update(userId: string, updateUserDto: UpdateUserDto) {
     const { username, name, avatar } = updateUserDto;
 
-    return this.prisma.user.update({
+    const usernameAlreadyTaken = await this.findOneUserByUsername(username);
+
+    if (usernameAlreadyTaken)
+      throw new BadRequestException('Username already taken!');
+
+    const updatedUser = this.prisma.user.update({
       where: {
         id: userId,
       },
@@ -30,9 +35,13 @@ export class UserService {
         avatar,
       },
     });
+
+    return updatedUser;
   }
 
   async deleteUser(userId: string) {
+    await this.findOneUserById(userId);
+
     await this.prisma.user.delete({
       where: {
         id: userId,
@@ -62,6 +71,16 @@ export class UserService {
     });
 
     if (!foundUser) throw new UserNotFoundException();
+
+    return foundUser;
+  }
+
+  private async findOneUserByUsername(username: string) {
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
 
     return foundUser;
   }
