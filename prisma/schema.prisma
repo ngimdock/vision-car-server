@@ -15,7 +15,7 @@ model User {
   avatar   String?
   hash     String
 
-  role Role @default(CUSTOMER)
+  role      Role    @default(CUSTOMER)
   isBlocked Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -54,9 +54,10 @@ model CreditCard {
 
 model Car {
   id               String   @id @default(uuid())
-  brand            String
+  brand            String   @unique
   description      String
   images           String[]
+  availableStock   Int
   price            Int
   reductionPercent Int
 
