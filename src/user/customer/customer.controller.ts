@@ -7,6 +7,8 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { Roles } from 'src/auth/decorator';
 import { TWO_MINUTE } from 'src/common/constants';
 import { PaginateDto } from 'src/common/dto';
 import { CustomerService } from './customer.service';
@@ -16,6 +18,7 @@ import { CustomerRoute } from './enums';
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  @Roles(Role.ADMIN)
   @Get(CustomerRoute.all)
   @UseInterceptors(CacheInterceptor)
   @CacheKey(CustomerRoute.customers)

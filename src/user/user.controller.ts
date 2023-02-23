@@ -8,7 +8,8 @@ import {
   Param,
   Patch,
 } from '@nestjs/common';
-import { GetUserId } from 'src/auth/decorator';
+import { Role } from '@prisma/client';
+import { GetUserId, Roles } from 'src/auth/decorator';
 import { UpdateUserDto } from './dto';
 import { UserRoutes } from './enums';
 import { UserService } from './user.service';
@@ -35,6 +36,7 @@ export class UserController {
     return await this.userService.deleteUser(userId);
   }
 
+  @Roles(Role.ADMIN)
   @Get(`:${UserController.userId}`)
   findOneUserById(@Param(UserController.userId) userId: string) {
     return this.userService.findOneUserById(userId);

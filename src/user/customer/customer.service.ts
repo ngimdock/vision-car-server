@@ -37,7 +37,11 @@ export class CustomerService {
       take: limit,
     });
 
-    const usersCount = await this.prisma.user.count();
+    const usersCount = await this.prisma.user.count({
+      where: {
+        role: Role.CUSTOMER,
+      },
+    });
 
     return {
       count: usersCount,

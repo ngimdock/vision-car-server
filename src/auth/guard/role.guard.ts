@@ -31,6 +31,8 @@ export class RoleGuard implements CanActivate {
 
     const currentUserGetRole = roles.includes(session.user.role);
 
+    console.log({ session });
+
     if (!currentUserGetRole)
       throw new UnauthorizedException(
         "You don't have permission to access this resource",

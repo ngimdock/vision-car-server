@@ -51,6 +51,13 @@ export class UserService {
         name: true,
         avatar: true,
         createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            bookedCars: true,
+            likedCars: true,
+          },
+        },
       },
     });
 
