@@ -25,7 +25,7 @@ export class CustomerService {
         _count: {
           select: {
             bookedCars: true,
-            likedCars: true,
+            savedCars: true,
           },
         },
       },

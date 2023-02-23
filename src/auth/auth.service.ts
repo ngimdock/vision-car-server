@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CredentialsIncorrectException } from 'src/common/exceptions';
+import {
+  CredentialsIncorrectException,
+  CustomHttpExeption,
+} from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
@@ -30,7 +33,7 @@ export class AuthService {
 
       return { id: newUser.id, email: newUser.email, role: newUser.role };
     } catch (err) {
-      throw err;
+      throw new CustomHttpExeption();
     }
   }
 
@@ -50,7 +53,7 @@ export class AuthService {
 
       return { id: foundUser.id, email: foundUser.email, role: foundUser.role };
     } catch (err) {
-      throw err;
+      throw new CustomHttpExeption();
     }
   }
 

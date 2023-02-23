@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PaginateDto } from 'src/common/dto';
 import { ErrorCode } from 'src/common/enums';
 import { CustomHttpExeption } from 'src/common/exceptions';
@@ -53,6 +53,57 @@ export class CarService {
     }
   }
 
+  async bookACar(userId: string, carId: string) {
+    const car = await this.findOneById(carId);
+
+    if (car.availableStock === this?.STOCK_FINISHED)
+      throw new ForbiddenException("Car's stock is finished");
+
+    await this.prisma.car.update({
+      where: {
+        id: carId,
+      },
+
+      data: {
+        availableStock: { decrement: 1 },
+      },
+    });
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+
+      data: {
+        bookedCars: {
+          connect: {
+            id: carId,
+          },
+        },
+      },
+
+      include: {
+        _count: {
+          select: {
+            bookedCars: true,
+          },
+        },
+        bookedCars: {
+          select: {
+            id: true,
+            brand: true,
+            description: true,
+            images: true,
+            price: true,
+            reductionPercent: true,
+          },
+        },
+      },
+    });
+
+    return updatedUser;
+  }
+
   async findAll(paginate: PaginateDto): Promise<PaginateResultType> {
     const { offset, limit } = paginate;
 
@@ -102,7 +153,7 @@ export class CarService {
         _count: {
           select: {
             usersWhoBooked: true,
-            usersWhoLiked: true,
+            usersWhoSaved: true,
           },
         },
       },

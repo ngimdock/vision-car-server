@@ -5,4 +5,5 @@ export enum CarRoute {
   create = 'create',
   update = 'update',
   delete = 'delete',
+  book = 'book',
 }

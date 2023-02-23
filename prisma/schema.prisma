@@ -24,7 +24,7 @@ model User {
   creditCards CreditCard[]
 
   bookedCars    Car[] @relation("BookedCars")
-  likedCars     Car[] @relation("LikedCars")
+  savedCars     Car[] @relation("savedCars")
   publishedCars Car[] @relation("PublishedCars")
 
   contryId String?
@@ -65,10 +65,10 @@ model Car {
   updatedAt DateTime @updatedAt
 
   usersWhoBooked User[] @relation("BookedCars")
-  usersWhoLiked  User[] @relation("LikedCars")
+  usersWhoSaved  User[] @relation("savedCars")
 
   publisherId String?
-  publisher   User?   @relation("PublishedCars", fields: [publisherId], references: [id], onDelete: SetNull) 
+  publisher   User?   @relation("PublishedCars", fields: [publisherId], references: [id], onDelete: SetNull)
 }
 
 enum Role {

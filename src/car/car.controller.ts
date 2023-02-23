@@ -28,6 +28,15 @@ export class CarController {
     return this.carService.create(adminId, createCarDto);
   }
 
+  @Post(`${CarRoute.book}/:${CarController.carId}`)
+  @HttpCode(HttpStatus.OK)
+  bookACar(
+    @GetUserId() userId: string,
+    @Param(CarController.carId) carId: string,
+  ) {
+    return this.carService.bookACar(userId, carId);
+  }
+
   @Get(CarRoute.all)
   findAll(@Query() paginate: PaginateDto) {
     return this.carService.findAll(paginate);

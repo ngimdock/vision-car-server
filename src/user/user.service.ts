@@ -12,6 +12,11 @@ export class UserService {
       where: {
         id: userId,
       },
+
+      include: {
+        bookedCars: true,
+        savedCars: true,
+      },
     });
 
     return currentUser;
@@ -64,7 +69,7 @@ export class UserService {
         _count: {
           select: {
             bookedCars: true,
-            likedCars: true,
+            savedCars: true,
           },
         },
       },
