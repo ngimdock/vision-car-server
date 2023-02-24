@@ -28,15 +28,6 @@ export class CarController {
     return this.carService.create(adminId, createCarDto);
   }
 
-  @Post(`${CarRoute.book}/:${CarController.carId}`)
-  @HttpCode(HttpStatus.OK)
-  bookACar(
-    @GetUserId() userId: string,
-    @Param(CarController.carId) carId: string,
-  ) {
-    return this.carService.bookACar(userId, carId);
-  }
-
   @Get(CarRoute.all)
   findAll(@Query() paginate: PaginateDto) {
     return this.carService.findAll(paginate);
@@ -52,5 +43,23 @@ export class CarController {
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteOne(@Param(`${CarController.carId}`) carId: string) {
     return this.carService.deleteOne(carId);
+  }
+
+  @Post(`${CarRoute.book}/:${CarController.carId}`)
+  @HttpCode(HttpStatus.OK)
+  bookACar(
+    @GetUserId() userId: string,
+    @Param(CarController.carId) carId: string,
+  ) {
+    return this.carService.bookACar(userId, carId);
+  }
+
+  @Post(`${CarRoute.unBook}/:${CarController.carId}`)
+  @HttpCode(HttpStatus.OK)
+  unBookACar(
+    @GetUserId() userId: string,
+    @Param(CarController.carId) carId: string,
+  ) {
+    return this.carService.unBookACar(userId, carId);
   }
 }

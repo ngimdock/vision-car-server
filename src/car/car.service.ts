@@ -76,6 +76,16 @@ export class CarService {
     }
   }
 
+  async unBookACar(userId: string, carId: string) {
+    try {
+      await this.userService.userUnBookCar(userId, carId);
+
+      await this.incrementCarsStocks(carId);
+    } catch (e) {
+      throw new CustomHttpExeption();
+    }
+  }
+
   async findAll(paginate: PaginateDto): Promise<PaginateResultType> {
     const { offset, limit } = paginate;
 
@@ -154,6 +164,18 @@ export class CarService {
 
       data: {
         availableStock: { decrement: 1 },
+      },
+    });
+  }
+
+  private incrementCarsStocks(carId: string) {
+    return this.prisma.car.update({
+      where: {
+        id: carId,
+      },
+
+      data: {
+        availableStock: { increment: 1 },
       },
     });
   }

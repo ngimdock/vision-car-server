@@ -125,6 +125,22 @@ export class UserService {
     });
   }
 
+  userUnBookCar(userId: string, carId: string) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+
+      data: {
+        bookedCars: {
+          disconnect: {
+            id: carId,
+          },
+        },
+      },
+    });
+  }
+
   userSaveCar(userId: string, carId: string) {
     return this.prisma.user.update({
       where: {
@@ -134,6 +150,22 @@ export class UserService {
       data: {
         savedCars: {
           connect: {
+            id: carId,
+          },
+        },
+      },
+    });
+  }
+
+  userUnSaveCar(userId: string, carId: string) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+
+      data: {
+        savedCars: {
+          disconnect: {
             id: carId,
           },
         },
