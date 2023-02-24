@@ -4,6 +4,7 @@ import { ErrorCode } from 'src/common/enums';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
 import { CreateCarDto } from './dto';
 import { CarNotFoundException, InvalidDataException } from './exceptions';
 
@@ -11,7 +12,10 @@ import { CarNotFoundException, InvalidDataException } from './exceptions';
 export class CarService {
   private readonly STOCK_FINISHED = 0;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
 
   async create(adminId: string, createCarDto: CreateCarDto) {
     const {
@@ -54,54 +58,19 @@ export class CarService {
   }
 
   async bookACar(userId: string, carId: string) {
-    const car = await this.findOneById(carId);
+    const carToBook = await this.findOneById(carId);
 
-    if (car.availableStock === this?.STOCK_FINISHED)
+    if (carToBook.availableStock <= this?.STOCK_FINISHED)
       throw new ForbiddenException("Car's stock is finished");
 
-    await this.prisma.car.update({
-      where: {
-        id: carId,
-      },
+    await this.decrementCarsStocks(carId);
 
-      data: {
-        availableStock: { decrement: 1 },
-      },
-    });
+    const userWithBookedCars = await this.userService.userBookCar(
+      userId,
+      carId,
+    );
 
-    const updatedUser = await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-
-      data: {
-        bookedCars: {
-          connect: {
-            id: carId,
-          },
-        },
-      },
-
-      include: {
-        _count: {
-          select: {
-            bookedCars: true,
-          },
-        },
-        bookedCars: {
-          select: {
-            id: true,
-            brand: true,
-            description: true,
-            images: true,
-            price: true,
-            reductionPercent: true,
-          },
-        },
-      },
-    });
-
-    return updatedUser;
+    return userWithBookedCars;
   }
 
   async findAll(paginate: PaginateDto): Promise<PaginateResultType> {
@@ -170,6 +139,18 @@ export class CarService {
     return await this.prisma.car.delete({
       where: {
         id: carId,
+      },
+    });
+  }
+
+  private decrementCarsStocks(carId: string) {
+    return this.prisma.car.update({
+      where: {
+        id: carId,
+      },
+
+      data: {
+        availableStock: { decrement: 1 },
       },
     });
   }

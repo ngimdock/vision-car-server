@@ -89,4 +89,35 @@ export class UserService {
 
     return foundUser;
   }
+
+  async userBookCar(userId: string, carId: string) {
+    const userWithBokedCars = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+
+      data: {
+        bookedCars: {
+          connect: {
+            id: carId,
+          },
+        },
+      },
+
+      include: {
+        bookedCars: {
+          select: {
+            id: true,
+            brand: true,
+            description: true,
+            images: true,
+            price: true,
+            reductionPercent: true,
+          },
+        },
+      },
+    });
+
+    return userWithBokedCars;
+  }
 }
