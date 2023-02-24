@@ -8,6 +8,7 @@ import { RoleGuard, SessionGuard } from './auth/guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { CarModule } from './car/car.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -32,6 +33,7 @@ import * as redisStore from 'cache-manager-redis-store';
     PrismaModule,
     UserModule,
     CarModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [

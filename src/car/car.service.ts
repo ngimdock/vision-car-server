@@ -5,6 +5,7 @@ import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { STOCK_FINISHED } from './constants';
 import { CreateCarDto } from './dto';
 import {
   CarNotFoundException,
@@ -14,8 +15,6 @@ import {
 
 @Injectable()
 export class CarService {
-  private readonly STOCK_FINISHED = 0;
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
@@ -65,7 +64,7 @@ export class CarService {
     try {
       const carToBook = await this.findOneById(carId);
 
-      if (carToBook.availableStock <= this?.STOCK_FINISHED)
+      if (carToBook.availableStock <= STOCK_FINISHED)
         throw new CarStockFinishedException();
 
       await this.userService.userBookCar(userId, carId);
@@ -107,7 +106,7 @@ export class CarService {
 
     const allCars = await this.prisma.car.findMany({
       where: {
-        availableStock: { gt: this?.STOCK_FINISHED },
+        availableStock: { gt: STOCK_FINISHED },
       },
 
       select: {
@@ -130,7 +129,7 @@ export class CarService {
 
     const totalCar = await this.prisma.car.count({
       where: {
-        availableStock: { gt: this?.STOCK_FINISHED },
+        availableStock: { gt: STOCK_FINISHED },
       },
     });
 
