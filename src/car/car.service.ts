@@ -6,7 +6,11 @@ import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateCarDto } from './dto';
-import { CarNotFoundException, InvalidDataException } from './exceptions';
+import {
+  CarNotFoundException,
+  CarStockFinishedException,
+  InvalidDataException,
+} from './exceptions';
 
 @Injectable()
 export class CarService {
@@ -58,19 +62,18 @@ export class CarService {
   }
 
   async bookACar(userId: string, carId: string) {
-    const carToBook = await this.findOneById(carId);
+    try {
+      const carToBook = await this.findOneById(carId);
 
-    if (carToBook.availableStock <= this?.STOCK_FINISHED)
-      throw new ForbiddenException("Car's stock is finished");
+      if (carToBook.availableStock <= this?.STOCK_FINISHED)
+        throw new CarStockFinishedException();
 
-    await this.decrementCarsStocks(carId);
+      await this.userService.userBookCar(userId, carId);
 
-    const userWithBookedCars = await this.userService.userBookCar(
-      userId,
-      carId,
-    );
-
-    return userWithBookedCars;
+      await this.decrementCarsStocks(carId);
+    } catch (e) {
+      throw new CustomHttpExeption();
+    }
   }
 
   async findAll(paginate: PaginateDto): Promise<PaginateResultType> {

@@ -14,8 +14,27 @@ export class UserService {
       },
 
       include: {
-        bookedCars: true,
-        savedCars: true,
+        bookedCars: {
+          select: {
+            id: true,
+            brand: true,
+            description: true,
+            images: true,
+            price: true,
+            reductionPercent: true,
+          },
+        },
+
+        savedCars: {
+          select: {
+            id: true,
+            brand: true,
+            description: true,
+            images: true,
+            price: true,
+            reductionPercent: true,
+          },
+        },
       },
     });
 
@@ -90,8 +109,8 @@ export class UserService {
     return foundUser;
   }
 
-  async userBookCar(userId: string, carId: string) {
-    const userWithBokedCars = await this.prisma.user.update({
+  userBookCar(userId: string, carId: string) {
+    return this.prisma.user.update({
       where: {
         id: userId,
       },
@@ -103,21 +122,22 @@ export class UserService {
           },
         },
       },
+    });
+  }
 
-      include: {
-        bookedCars: {
-          select: {
-            id: true,
-            brand: true,
-            description: true,
-            images: true,
-            price: true,
-            reductionPercent: true,
+  userSaveCar(userId: string, carId: string) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+
+      data: {
+        savedCars: {
+          connect: {
+            id: carId,
           },
         },
       },
     });
-
-    return userWithBokedCars;
   }
 }
