@@ -7,4 +7,6 @@ export enum CarRoute {
   delete = 'delete',
   book = 'book',
   unBook = 'un-book',
+  save = 'save',
+  unSave = 'un-save',
 }

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PaginateDto } from 'src/common/dto';
 import { ErrorCode } from 'src/common/enums';
 import { CustomHttpExeption } from 'src/common/exceptions';
@@ -81,6 +81,22 @@ export class CarService {
       await this.userService.userUnBookCar(userId, carId);
 
       await this.incrementCarsStocks(carId);
+    } catch (e) {
+      throw new CustomHttpExeption();
+    }
+  }
+
+  async saveACar(userId: string, carId: string) {
+    try {
+      await this.userService.userSaveCar(userId, carId);
+    } catch (e) {
+      throw new CustomHttpExeption();
+    }
+  }
+
+  async unSaveACar(userId: string, carId: string) {
+    try {
+      await this.userService.userUnSaveCar(userId, carId);
     } catch (e) {
       throw new CustomHttpExeption();
     }

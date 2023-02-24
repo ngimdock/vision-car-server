@@ -62,4 +62,22 @@ export class CarController {
   ) {
     return this.carService.unBookACar(userId, carId);
   }
+
+  @Post(`${CarRoute.save}/:${CarController.carId}`)
+  @HttpCode(HttpStatus.OK)
+  saveACar(
+    @GetUserId() userId: string,
+    @Param(CarController.carId) carId: string,
+  ) {
+    return this.carService.saveACar(userId, carId);
+  }
+
+  @Post(`${CarRoute.unSave}/:${CarController.carId}`)
+  @HttpCode(HttpStatus.OK)
+  unSaveACar(
+    @GetUserId() userId: string,
+    @Param(CarController.carId) carId: string,
+  ) {
+    return this.carService.unSaveACar(userId, carId);
+  }
 }
