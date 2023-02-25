@@ -23,6 +23,7 @@ model User {
 
   creditCards CreditCard[]
 
+  orders Order[]
   bookedCars    Car[] @relation("BookedCars")
   savedCars     Car[] @relation("savedCars")
   publishedCars Car[] @relation("PublishedCars")
@@ -39,6 +40,7 @@ model Contry {
   tax  Int
 
   users User[]
+  chippers Chipper[]
 
   @@index([name])
 }
@@ -68,6 +70,7 @@ model Car {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  ortherBeloging Order[]
   usersWhoBooked User[] @relation("BookedCars")
   usersWhoSaved  User[] @relation("savedCars")
 
@@ -77,7 +80,79 @@ model Car {
   @@index([brand])
 }
 
+model Order {
+  id String @id @default(uuid())
+  date DateTime @default(now())
+  status OrderStatus @default(IN_PROGRESS)
+  paymentType  PaymentType
+
+  carsToPay  Car []
+  documents Document[]
+
+  orderDetails OrderDetail?
+
+  customerId String 
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model OrderDetail {
+  id String @id @default(uuid())
+  paymentRange PaymentRange
+  remainToPay Int
+
+  limitDate DateTime?
+
+  orderId String @unique
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Chipper {
+  id String @id @default(uuid())
+  name String @unique
+  code String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referenceContry Contry[]
+
+  @@index([name])
+}
+
+model Document {
+  id String @id @default(uuid())
+  type DocumentType
+  note String?
+  file String @unique
+
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
 enum Role {
   CUSTOMER
   ADMIN
+}
+
+enum OrderStatus {
+  IN_PROGRESS
+  VALIDATED
+  DELIVERED
+}
+
+enum DocumentType {
+  IMMATRICULATION
+  CERTIFICATE
+  PURCHASE_FORM
+}
+
+enum PaymentType {
+  TOTAL_PAY
+  CREDIT_PAY
+}
+
+enum PaymentRange {
+  X2
+  X3
+  X5
 }

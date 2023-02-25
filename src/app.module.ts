@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { CarModule } from './car/car.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ContryModule } from './contry/contry.module';
+import { OrderModule } from './order/order.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -36,6 +37,7 @@ import * as redisStore from 'cache-manager-redis-store';
     CarModule,
     SchedulerModule,
     ContryModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

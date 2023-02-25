@@ -48,6 +48,14 @@ export class ContryService {
       where: {
         id: contryId,
       },
+
+      include: {
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+      },
     });
 
     if (!foundContry) throw new ContryNotFoundException();
