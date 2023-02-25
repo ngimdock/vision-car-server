@@ -1,1 +1,4 @@
-export class CreateOrderDto {}
+export class CreateOrderDto {
+  paymentType: string;
+  carsToOrder: string[];
+}

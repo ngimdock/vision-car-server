@@ -23,10 +23,10 @@ model User {
 
   creditCards CreditCard[]
 
-  orders Order[]
-  bookedCars    Car[] @relation("BookedCars")
-  savedCars     Car[] @relation("savedCars")
-  publishedCars Car[] @relation("PublishedCars")
+  orders        Order[]
+  bookedCars    Car[]   @relation("BookedCars")
+  savedCars     Car[]   @relation("savedCars")
+  publishedCars Car[]   @relation("PublishedCars")
 
   contryId String?
   contry   Contry? @relation(fields: [contryId], references: [id])
@@ -35,11 +35,11 @@ model User {
 model Contry {
   id String @id @default(uuid())
 
-  name String @unique 
-  code Int @unique
+  name String @unique
+  code Int    @unique
   tax  Int
 
-  users User[]
+  users    User[]
   chippers Chipper[]
 
   @@index([name])
@@ -71,8 +71,8 @@ model Car {
   updatedAt DateTime @updatedAt
 
   ortherBeloging Order[]
-  usersWhoBooked User[] @relation("BookedCars")
-  usersWhoSaved  User[] @relation("savedCars")
+  usersWhoBooked User[]  @relation("BookedCars")
+  usersWhoSaved  User[]  @relation("savedCars")
 
   publisherId String?
   publisher   User?   @relation("PublishedCars", fields: [publisherId], references: [id], onDelete: SetNull)
@@ -81,33 +81,33 @@ model Car {
 }
 
 model Order {
-  id String @id @default(uuid())
-  date DateTime @default(now())
-  status OrderStatus @default(IN_PROGRESS)
-  paymentType  PaymentType
+  id          String      @id @default(uuid())
+  date        DateTime    @default(now())
+  status      OrderStatus @default(IN_PROGRESS)
+  paymentType PaymentType
 
-  carsToPay  Car []
+  carsToOrder Car[]
   documents Document[]
 
   orderDetails OrderDetail?
 
-  customerId String 
-  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
 
 model OrderDetail {
-  id String @id @default(uuid())
+  id           String       @id @default(uuid())
   paymentRange PaymentRange
-  remainToPay Int
+  remainToPay  Int
 
   limitDate DateTime?
 
   orderId String @unique
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Chipper {
-  id String @id @default(uuid())
+  id   String @id @default(uuid())
   name String @unique
   code String @unique
 
@@ -120,13 +120,13 @@ model Chipper {
 }
 
 model Document {
-  id String @id @default(uuid())
+  id   String       @id @default(uuid())
   type DocumentType
   note String?
-  file String @unique
+  file String       @unique
 
   orderId String
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

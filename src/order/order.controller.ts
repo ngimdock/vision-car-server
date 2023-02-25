@@ -1,15 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrderRoute } from './enum';
 
-@Controller('order')
+@Controller(OrderRoute.order)
 export class OrderController {
+  private static readonly customerId = 'customerId';
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  @Post(`${OrderRoute.create}/:${OrderController.customerId}}`)
+  create(
+    @Param(OrderController.customerId) customerId: string,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.orderService.create(customerId, createOrderDto);
   }
 
   @Get()
