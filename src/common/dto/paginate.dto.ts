@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, Max } from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, Max } from 'class-validator';
 export class PaginateDto {
   @IsNumber()
   @IsOptional()
@@ -8,6 +8,7 @@ export class PaginateDto {
   readonly offset?: number = 0;
 
   @IsNumber()
+  @IsPositive()
   @IsOptional()
   @Max(20)
   @Type(() => Number)

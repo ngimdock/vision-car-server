@@ -34,16 +34,18 @@ model User {
 model Contry {
   id String @id @default(uuid())
 
-  name String
-  code String
+  name String @unique 
+  code Int @unique
   tax  Int
 
   users User[]
+
+  @@index([name])
 }
 
 model CreditCard {
   id     String @id @default(uuid())
-  number String
+  number String @unique
   name   String
   cvc    String
   expiry String
@@ -71,6 +73,8 @@ model Car {
 
   publisherId String?
   publisher   User?   @relation("PublishedCars", fields: [publisherId], references: [id], onDelete: SetNull)
+
+  @@index([brand])
 }
 
 enum Role {

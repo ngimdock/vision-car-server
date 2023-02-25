@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { CarModule } from './car/car.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { ContryModule } from './contry/contry.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -34,6 +35,7 @@ import * as redisStore from 'cache-manager-redis-store';
     UserModule,
     CarModule,
     SchedulerModule,
+    ContryModule,
   ],
   controllers: [AppController],
   providers: [
