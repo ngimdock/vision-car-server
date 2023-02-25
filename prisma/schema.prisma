@@ -87,7 +87,7 @@ model Order {
   paymentType PaymentType
 
   carsToOrder Car[]
-  documents Document[]
+  documents   Document[]
 
   orderDetails OrderDetail?
 

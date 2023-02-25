@@ -6,20 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRoute } from './enum';
 
-@Controller(OrderRoute.order)
+@Controller(OrderRoute.orders)
 export class OrderController {
   private static readonly customerId = 'customerId';
+  private static readonly orderId = 'orderId';
+
   constructor(private readonly orderService: OrderService) {}
 
-  @Post(`${OrderRoute.create}/:${OrderController.customerId}}`)
+  @Post(`${OrderRoute.create}/:${OrderController.customerId}`)
   create(
-    @Param(OrderController.customerId) customerId: string,
+    @Param(OrderController.customerId, ParseUUIDPipe) customerId: string,
     @Body() createOrderDto: CreateOrderDto,
   ) {
     return this.orderService.create(customerId, createOrderDto);
@@ -30,9 +35,9 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  @Get(`${OrderRoute.find}/:${OrderController.orderId}`)
+  findOne(@Param(OrderController.orderId) orderId: string) {
+    return this.orderService.findOneById(orderId);
   }
 
   @Patch(':id')
@@ -41,6 +46,7 @@ export class OrderController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.orderService.remove(+id);
   }

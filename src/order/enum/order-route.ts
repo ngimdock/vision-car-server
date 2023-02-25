@@ -1,5 +1,5 @@
 export enum OrderRoute {
-  order = 'orders',
+  orders = 'orders',
   all = 'all',
   create = 'create',
   find = 'find',
