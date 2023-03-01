@@ -24,12 +24,27 @@ model User {
   creditCards CreditCard[]
 
   orders        Order[]
-  bookedCars    Car[]   @relation("BookedCars")
+  // bookedCars    Car[]   @relation("BookedCars")
+  bookedCars    UserBookCar[]
   savedCars     Car[]   @relation("savedCars")
   publishedCars Car[]   @relation("PublishedCars")
 
   contryId String?
   contry   Contry? @relation(fields: [contryId], references: [id])
+}
+
+
+model UserBookCar {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  carId String
+  car   Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  quantity Int
+  bookedAt DateTime @default(now())
+
+  @@id([userId, carId])
 }
 
 model Contry {
@@ -71,7 +86,8 @@ model Car {
   updatedAt DateTime @updatedAt
 
   ortherBeloging Order[]
-  usersWhoBooked User[]  @relation("BookedCars")
+  // usersWhoBooked User[]  @relation("BookedCars")
+  usersWhoBooked UserBookCar[]
   usersWhoSaved  User[]  @relation("savedCars")
 
   publisherId String?

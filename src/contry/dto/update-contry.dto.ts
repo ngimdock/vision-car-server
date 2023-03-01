@@ -1,5 +1,4 @@
 import {
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -20,6 +19,6 @@ export class UpdateContryDto {
 
   @IsNumber()
   @IsPositive()
-  @IsNotEmpty()
+  @IsOptional()
   tax: number;
 }

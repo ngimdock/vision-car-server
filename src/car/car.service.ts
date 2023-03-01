@@ -5,11 +5,12 @@ import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { CarRepository } from './car.repository';
 import { STOCK_FINISHED } from './constants';
-import { CreateCarDto } from './dto';
+import { BookACarDto, CreateCarDto } from './dto';
 import {
   CarNotFoundException,
-  CarStockFinishedException,
+  CarStockNotAvailableException,
   InvalidDataException,
 } from './exceptions';
 
@@ -18,6 +19,7 @@ export class CarService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly carRepository: CarRepository,
   ) {}
 
   async create(adminId: string, createCarDto: CreateCarDto) {
@@ -60,29 +62,25 @@ export class CarService {
     }
   }
 
-  async bookACar(userId: string, carId: string) {
-    try {
-      const carToBook = await this.findOneById(carId);
+  async bookACar(userId: string, bookACarDto: BookACarDto) {
+    const { carId, quantity } = bookACarDto;
 
-      if (carToBook.availableStock <= STOCK_FINISHED)
-        throw new CarStockFinishedException();
+    const carToBook = await this.findOneById(carId);
 
-      await this.userService.userBookCar(userId, carId);
+    if (!carToBook) throw new CarNotFoundException();
 
-      await this.decrementCarsStocks(carId);
-    } catch (e) {
-      throw new CustomHttpExeption();
-    }
+    if (carToBook.availableStock < quantity)
+      throw new CarStockNotAvailableException();
+
+    const bookData = await this.carRepository.bookACar(userId, bookACarDto);
+
+    await this.decraseCarsStocks(carId, quantity);
+
+    return bookData;
   }
 
   async unBookACar(userId: string, carId: string) {
-    try {
-      await this.userService.userUnBookCar(userId, carId);
-
-      await this.incrementCarsStocks(carId);
-    } catch (e) {
-      throw new CustomHttpExeption();
-    }
+    return { userId, carId };
   }
 
   async saveACar(userId: string, carId: string) {
@@ -171,26 +169,26 @@ export class CarService {
     });
   }
 
-  private decrementCarsStocks(carId: string) {
+  private decraseCarsStocks(carId: string, quantity: number) {
     return this.prisma.car.update({
       where: {
         id: carId,
       },
 
       data: {
-        availableStock: { decrement: 1 },
+        availableStock: { decrement: quantity },
       },
     });
   }
 
-  private incrementCarsStocks(carId: string) {
+  private increseCarsStocks(carId: string, quantity: number) {
     return this.prisma.car.update({
       where: {
         id: carId,
       },
 
       data: {
-        availableStock: { increment: 1 },
+        availableStock: { increment: quantity },
       },
     });
   }

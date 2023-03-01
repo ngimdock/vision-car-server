@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { BookACarDto } from 'src/car/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
@@ -16,12 +17,17 @@ export class UserService {
       include: {
         bookedCars: {
           select: {
-            id: true,
-            brand: true,
-            description: true,
-            images: true,
-            price: true,
-            reductionPercent: true,
+            bookedAt: true,
+            quantity: true,
+            car: {
+              select: {
+                id: true,
+                brand: true,
+                description: true,
+                images: true,
+                price: true,
+              },
+            },
           },
         },
 
@@ -44,10 +50,12 @@ export class UserService {
   async update(userId: string, updateUserDto: UpdateUserDto) {
     const { username, name, avatar } = updateUserDto;
 
-    const usernameAlreadyTaken = await this.findOneUserByUsername(username);
+    if (username) {
+      const usernameAlreadyTaken = await this.findOneUserByUsername(username);
 
-    if (usernameAlreadyTaken)
-      throw new BadRequestException('Username already taken!');
+      if (usernameAlreadyTaken)
+        throw new BadRequestException('Username already taken.');
+    }
 
     const updatedUser = this.prisma.user.update({
       where: {
@@ -107,38 +115,6 @@ export class UserService {
     });
 
     return foundUser;
-  }
-
-  userBookCar(userId: string, carId: string) {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-
-      data: {
-        bookedCars: {
-          connect: {
-            id: carId,
-          },
-        },
-      },
-    });
-  }
-
-  userUnBookCar(userId: string, carId: string) {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-
-      data: {
-        bookedCars: {
-          disconnect: {
-            id: carId,
-          },
-        },
-      },
-    });
   }
 
   userSaveCar(userId: string, carId: string) {

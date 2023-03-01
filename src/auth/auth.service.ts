@@ -38,23 +38,19 @@ export class AuthService {
   }
 
   async login({ email, password }: AuthDto): Promise<UserSessionData> {
-    try {
-      const foundUser = await this.prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
+    const foundUser = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
-      if (!foundUser) throw new CredentialsIncorrectException();
+    if (!foundUser) throw new CredentialsIncorrectException();
 
-      const isPasswordValid = await verifyPassword(foundUser.hash, password);
+    const isPasswordValid = await verifyPassword(foundUser.hash, password);
 
-      if (!isPasswordValid) throw new CredentialsIncorrectException();
+    if (!isPasswordValid) throw new CredentialsIncorrectException();
 
-      return { id: foundUser.id, email: foundUser.email, role: foundUser.role };
-    } catch (err) {
-      throw new CustomHttpExeption();
-    }
+    return { id: foundUser.id, email: foundUser.email, role: foundUser.role };
   }
 
   destroySession(session: UserSession) {

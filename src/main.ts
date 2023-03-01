@@ -40,6 +40,9 @@ async function bootstrap() {
       transform: true,
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
@@ -55,6 +58,6 @@ async function bootstrap() {
       throw err;
     });
 
-  await app.listen(5000);
+  await app.listen(3333);
 }
 bootstrap();

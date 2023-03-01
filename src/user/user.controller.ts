@@ -33,6 +33,8 @@ export class UserController {
 
   @Patch(UserRoutes.update)
   update(@GetUserId() userId: string, @Body() updateUserDto: UpdateUserDto) {
+    console.log({ updateUserDto });
+
     return this.userService.update(userId, updateUserDto);
   }
 
