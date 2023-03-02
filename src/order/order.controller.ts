@@ -8,12 +8,12 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRoute } from './enum';
+import { GetUserId } from 'src/auth/decorator';
+import { CreateOrderDto } from './dto';
 
 @Controller(OrderRoute.orders)
 export class OrderController {
@@ -22,12 +22,9 @@ export class OrderController {
 
   constructor(private readonly orderService: OrderService) {}
 
-  @Post(`${OrderRoute.create}/:${OrderController.customerId}`)
-  create(
-    @Param(OrderController.customerId, ParseUUIDPipe) customerId: string,
-    @Body() createOrderDto: CreateOrderDto,
-  ) {
-    return this.orderService.create(customerId, createOrderDto);
+  @Post(`${OrderRoute.create}`)
+  create(@GetUserId() userId: string, createOrderDto: CreateOrderDto) {
+    return this.orderService.create(userId, createOrderDto);
   }
 
   @Get()

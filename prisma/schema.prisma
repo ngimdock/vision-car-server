@@ -24,7 +24,6 @@ model User {
   creditCards CreditCard[]
 
   orders        Order[]
-  // bookedCars    Car[]   @relation("BookedCars")
   bookedCars    UserBookCar[]
   savedCars     Car[]   @relation("savedCars")
   publishedCars Car[]   @relation("PublishedCars")
@@ -35,6 +34,9 @@ model User {
 
 
 model UserBookCar {
+
+  id String @id @default(uuid())
+  
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -44,7 +46,10 @@ model UserBookCar {
   quantity Int
   bookedAt DateTime @default(now())
 
-  @@id([userId, carId])
+  orderId String?
+  order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, carId])
 }
 
 model Contry {
@@ -85,8 +90,6 @@ model Car {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ortherBeloging Order[]
-  // usersWhoBooked User[]  @relation("BookedCars")
   usersWhoBooked UserBookCar[]
   usersWhoSaved  User[]  @relation("savedCars")
 
@@ -102,7 +105,7 @@ model Order {
   status      OrderStatus @default(IN_PROGRESS)
   paymentType PaymentType
 
-  carsToOrder Car[]
+  bookingsToOrder UserBookCar[]
   documents   Document[]
 
   orderDetails OrderDetail?

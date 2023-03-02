@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { OrderNotFoundException } from './exceptions';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
 
   async create(customerId: string, createOrderDto: CreateOrderDto) {
-    return { customerId, createOrderDto };
+    const { bookedCars } = await this.userService.findMe(customerId);
+
+    return bookedCars;
   }
 
   findAll() {
@@ -17,25 +22,7 @@ export class OrderService {
   }
 
   async findOneById(orderId: string) {
-    const foundOrder = await this.prisma.order.findUnique({
-      where: {
-        id: orderId,
-      },
-
-      include: {
-        carsToOrder: {
-          select: {
-            brand: true,
-            images: true,
-            price: true,
-          },
-        },
-      },
-    });
-
-    if (!foundOrder) throw new OrderNotFoundException();
-
-    return foundOrder;
+    return orderId;
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
