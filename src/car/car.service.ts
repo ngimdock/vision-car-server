@@ -4,11 +4,11 @@ import { ErrorCode } from 'src/common/enums';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserService } from 'src/user/user.service';
 import { CarRepository } from './car.repository';
 import { STOCK_FINISHED } from './constants';
 import { BookACarDto, CreateCarDto } from './dto';
 import {
+  BookingNotFoundException,
   CarNotFoundException,
   CarStockNotAvailableException,
   InvalidDataException,
@@ -18,7 +18,6 @@ import {
 export class CarService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService,
     private readonly carRepository: CarRepository,
   ) {}
 
@@ -72,20 +71,39 @@ export class CarService {
     if (carToBook.availableStock < quantity)
       throw new CarStockNotAvailableException();
 
-    const bookData = await this.carRepository.bookACar(userId, bookACarDto);
+    const bookData = await this.prisma.$transaction(async () => {
+      const bookData = await this.carRepository.bookACar(userId, bookACarDto);
 
-    await this.decraseCarsStocks(carId, quantity);
+      await this.decraseCarsStocks(carId, quantity);
+
+      return bookData;
+    });
 
     return bookData;
   }
 
   async unBookACar(userId: string, carId: string) {
-    return { userId, carId };
+    const foundedBooking = await this.carRepository.findOneBooking(
+      userId,
+      carId,
+    );
+
+    if (!foundedBooking) throw new BookingNotFoundException();
+
+    const bookingDeleted = await this.prisma.$transaction(async () => {
+      const deletedBooking = await this.carRepository.unBookACar(userId, carId);
+
+      await this.increseCarsStocks(carId, foundedBooking.quantity);
+
+      return deletedBooking;
+    });
+
+    return bookingDeleted;
   }
 
   async saveACar(userId: string, carId: string) {
     try {
-      await this.userService.userSaveCar(userId, carId);
+      await this.carRepository.saveACar(userId, carId);
     } catch (e) {
       throw new CustomHttpExeption();
     }
@@ -93,7 +111,7 @@ export class CarService {
 
   async unSaveACar(userId: string, carId: string) {
     try {
-      await this.userService.userUnSaveCar(userId, carId);
+      await this.carRepository.unsaveACar(userId, carId);
     } catch (e) {
       throw new CustomHttpExeption();
     }

@@ -16,6 +16,7 @@
     "db:dev:restart": "yarn db:dev:stop && yarn db:dev:start",
     "prisma:dev:deploy": "npx prisma migrate deploy",
     "prisma:dev:studio": "npx prisma studio",
+    "prisma:dev:display": "yarn prisma:dev:deploy && yarn prisma:dev:studio",
     "db:test:start": "docker compose up test-db -d && sleep 1 && yarn prisma:test:deploy",
     "db:test:stop": "docker compose rm test-db -s -f -v",
     "db:test:restart": "yarn db:test:stop && yarn db:test:start",

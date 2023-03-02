@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
 } from '@nestjs/common';
@@ -55,7 +56,7 @@ export class CarController {
   @HttpCode(HttpStatus.OK)
   unBookACar(
     @GetUserId() userId: string,
-    @Param(CarController.carId) carId: string,
+    @Param(CarController.carId, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.unBookACar(userId, carId);
   }
@@ -64,7 +65,7 @@ export class CarController {
   @HttpCode(HttpStatus.OK)
   saveACar(
     @GetUserId() userId: string,
-    @Param(CarController.carId) carId: string,
+    @Param(CarController.carId, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.saveACar(userId, carId);
   }
@@ -73,7 +74,7 @@ export class CarController {
   @HttpCode(HttpStatus.OK)
   unSaveACar(
     @GetUserId() userId: string,
-    @Param(CarController.carId) carId: string,
+    @Param(CarController.carId, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.unSaveACar(userId, carId);
   }

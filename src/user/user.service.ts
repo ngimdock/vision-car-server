@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { BookACarDto } from 'src/car/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
@@ -115,37 +114,5 @@ export class UserService {
     });
 
     return foundUser;
-  }
-
-  userSaveCar(userId: string, carId: string) {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-
-      data: {
-        savedCars: {
-          connect: {
-            id: carId,
-          },
-        },
-      },
-    });
-  }
-
-  userUnSaveCar(userId: string, carId: string) {
-    return this.prisma.user.update({
-      where: {
-        id: userId,
-      },
-
-      data: {
-        savedCars: {
-          disconnect: {
-            id: carId,
-          },
-        },
-      },
-    });
   }
 }

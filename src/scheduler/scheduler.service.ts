@@ -9,14 +9,14 @@ export class SchedulerService {
 
   private readonly logger = new Logger(SchedulerService.name);
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  async deleteCarsWithFinishedStock() {
-    await this.prisma.car.deleteMany({
-      where: {
-        availableStock: { lte: STOCK_FINISHED },
-      },
-    });
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // async deleteCarsWithFinishedStock() {
+  //   await this.prisma.car.deleteMany({
+  //     where: {
+  //       availableStock: { lte: STOCK_FINISHED },
+  //     },
+  //   });
 
-    this.logger.verbose('Deleted cars with finished stock');
-  }
+  //   this.logger.verbose('Deleted cars with finished stock');
+  // }
 }
