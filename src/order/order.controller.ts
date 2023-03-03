@@ -23,7 +23,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post(`${OrderRoute.create}`)
-  create(@GetUserId() userId: string, createOrderDto: CreateOrderDto) {
+  create(@GetUserId() userId: string, @Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(userId, createOrderDto);
   }
 

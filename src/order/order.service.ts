@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Document, DocumentType } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -14,7 +15,11 @@ export class OrderService {
   async create(customerId: string, createOrderDto: CreateOrderDto) {
     const { bookedCars } = await this.userService.findMe(customerId);
 
-    return bookedCars;
+    const allBookingIds = bookedCars.map((booking) => booking.id);
+
+    console.log({ allBookingIds });
+
+    return allBookingIds;
   }
 
   findAll() {

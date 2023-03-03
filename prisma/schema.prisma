@@ -67,9 +67,9 @@ model Contry {
 
 model CreditCard {
   id     String @id @default(uuid())
-  number String @unique
+  number Int @unique
   name   String
-  cvc    String
+  cvc    Int
   expiry String
 
   userId String
