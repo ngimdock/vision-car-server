@@ -115,7 +115,7 @@ export class CreditCardService {
     if (amountToDebit > foundCreditCard.balance)
       throw new InsufficientBalanceException();
 
-    const creditCardDebited = await this.prisma.creditCard.update({
+    const creditedCardDebited = await this.prisma.creditCard.update({
       where: {
         id: creditCardId,
       },
@@ -125,6 +125,6 @@ export class CreditCardService {
       },
     });
 
-    return creditCardDebited;
+    return creditedCardDebited;
   }
 }

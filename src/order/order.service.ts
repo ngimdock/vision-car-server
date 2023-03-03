@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Document, DocumentType } from '@prisma/client';
+import { CreditCard } from '@prisma/client';
+import { InsufficientBalanceException } from 'src/credit-card/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -13,13 +14,23 @@ export class OrderService {
   ) {}
 
   async create(customerId: string, createOrderDto: CreateOrderDto) {
-    const { bookedCars } = await this.userService.findMe(customerId);
+    const { bookedCars, creditCards } = await this.userService.findMe(
+      customerId,
+    );
+
+    const targetCreditCard = this.getCreditCard(
+      creditCards,
+      createOrderDto.creditCard,
+    );
+
+    const bookingsAmount = this.computeBookingsAmount(bookedCars);
+
+    if (bookingsAmount > targetCreditCard.balance)
+      throw new InsufficientBalanceException();
 
     const allBookingIds = bookedCars.map((booking) => booking.id);
 
-    console.log({ allBookingIds });
-
-    return createOrderDto;
+    return { targetCreditCard, bookingsAmount };
   }
 
   findAll() {
@@ -36,5 +47,28 @@ export class OrderService {
 
   remove(id: number) {
     return `This action removes a #${id} order`;
+  }
+
+  private computeBookingsAmount(bookings: any[]): number {
+    const INITIAL_AMOUNT = 0;
+
+    const bookingsAmount = bookings.reduce(
+      (amountAccumulator, currentBooking) => {
+        return (amountAccumulator +=
+          currentBooking.quantity * currentBooking.car.price);
+      },
+      INITIAL_AMOUNT,
+    );
+
+    return bookingsAmount;
+  }
+
+  private getCreditCard(
+    creditCards: CreditCard[],
+    creditCardIdTarget: string,
+  ): CreditCard {
+    return creditCards.find(
+      (currentCreditCard) => currentCreditCard.id === creditCardIdTarget,
+    );
   }
 }
