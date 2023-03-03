@@ -61,6 +61,7 @@ model Contry {
 
   users    User[]
   chippers Chipper[]
+  orders  Order[]
 
   @@index([name])
 }
@@ -76,6 +77,8 @@ model CreditCard {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orders Order[]
 }
 
 model Car {
@@ -114,6 +117,12 @@ model Order {
   documents   Document[]
 
   orderDetails OrderDetail?
+
+  deliveryContryId String
+  deliveryContry   Contry @relation(fields: [deliveryContryId], references: [id])
+
+  creditCardId String?
+  creditCard   CreditCard? @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
 
   customerId String
   customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)

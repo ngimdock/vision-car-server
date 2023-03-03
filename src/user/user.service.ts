@@ -15,6 +15,7 @@ export class UserService {
 
       include: {
         creditCards: true,
+        orders: true,
         bookedCars: {
           select: {
             id: true,
