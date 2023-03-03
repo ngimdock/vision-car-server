@@ -49,7 +49,7 @@ model UserBookCar {
   orderId String?
   order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, carId])
+  @@unique([userId, carId, bookedAt])
 }
 
 model Contry {

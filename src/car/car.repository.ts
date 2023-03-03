@@ -33,18 +33,17 @@ export class CarRepository {
 
       return bookData;
     } catch (err) {
+      console.log({ msg: err.code });
+
       throw new CustomHttpExeption();
     }
   }
 
-  async unBookACar(userId: string, carId: string) {
+  async unBookACar(bookingId: string) {
     try {
       const unBookData = await this.prisma.userBookCar.delete({
         where: {
-          userId_carId: {
-            userId,
-            carId,
-          },
+          id: bookingId,
         },
 
         select: {
@@ -66,13 +65,10 @@ export class CarRepository {
     }
   }
 
-  async findOneBooking(userId: string, carId: string) {
+  async findOneBooking(bookingId: string) {
     const booking = await this.prisma.userBookCar.findUnique({
       where: {
-        userId_carId: {
-          userId,
-          carId,
-        },
+        id: bookingId,
       },
     });
 

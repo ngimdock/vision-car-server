@@ -19,7 +19,8 @@ import { CarRoute } from './enums';
 
 @Controller(CarRoute.cars)
 export class CarController {
-  public static carId = 'carId';
+  private static readonly carId = 'carId';
+  private static readonly bookingId = 'bookingId';
 
   constructor(private readonly carService: CarService) {}
 
@@ -52,13 +53,10 @@ export class CarController {
     return this.carService.bookACar(userId, bookACarDto);
   }
 
-  @Post(`${CarRoute.unBook}/:${CarController.carId}`)
+  @Post(`${CarRoute.unBook}/:${CarController.bookingId}`)
   @HttpCode(HttpStatus.OK)
-  unBookACar(
-    @GetUserId() userId: string,
-    @Param(CarController.carId, ParseUUIDPipe) carId: string,
-  ) {
-    return this.carService.unBookACar(userId, carId);
+  unBookACar(@Param(CarController.bookingId, ParseUUIDPipe) bookingId: string) {
+    return this.carService.unBookACar(bookingId);
   }
 
   @Post(`${CarRoute.save}/:${CarController.carId}`)

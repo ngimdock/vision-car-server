@@ -82,18 +82,18 @@ export class CarService {
     return bookData;
   }
 
-  async unBookACar(userId: string, carId: string) {
-    const foundedBooking = await this.carRepository.findOneBooking(
-      userId,
-      carId,
-    );
+  async unBookACar(bookingId: string) {
+    const foundedBooking = await this.carRepository.findOneBooking(bookingId);
 
     if (!foundedBooking) throw new BookingNotFoundException();
 
     const bookingDeleted = await this.prisma.$transaction(async () => {
-      const deletedBooking = await this.carRepository.unBookACar(userId, carId);
+      const deletedBooking = await this.carRepository.unBookACar(bookingId);
 
-      await this.increseCarsStocks(carId, foundedBooking.quantity);
+      await this.increseCarsStocks(
+        foundedBooking.carId,
+        foundedBooking.quantity,
+      );
 
       return deletedBooking;
     });
