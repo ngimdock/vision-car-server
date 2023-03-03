@@ -71,7 +71,7 @@ export class CreditCardController {
     return this.creditCardService.remove(userId, creditCardId);
   }
 
-  @Post(`${CreditCardRoutes.recharge}/:${CreditCardController.creditCardId}`)
+  @Patch(`${CreditCardRoutes.recharge}/:${CreditCardController.creditCardId}`)
   rechargeCreditCard(
     @GetUserId() userId: string,
     @Param(CreditCardController.creditCardId, ParseUUIDPipe)
@@ -85,7 +85,7 @@ export class CreditCardController {
     );
   }
 
-  @Post(`${CreditCardRoutes.debit}/:${CreditCardController.creditCardId}`)
+  @Patch(`${CreditCardRoutes.debit}/:${CreditCardController.creditCardId}`)
   debitCreditCard(
     @GetUserId() userId: string,
     @Param(CreditCardController.creditCardId, ParseUUIDPipe)

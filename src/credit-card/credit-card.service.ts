@@ -106,13 +106,25 @@ export class CreditCardService {
   async debitCreditCard(
     userId: string,
     creditCardId: string,
-    { amount }: BalanceHandlerCreditCardDto,
+    { amount: amountToDebit }: BalanceHandlerCreditCardDto,
   ) {
     const foundCreditCard = await this.findOne(userId, creditCardId);
 
     if (!foundCreditCard) throw new CreditCardNotFoundException();
 
-    if (amount > foundCreditCard.balance)
+    if (amountToDebit > foundCreditCard.balance)
       throw new InsufficientBalanceException();
+
+    const creditCardDebited = await this.prisma.creditCard.update({
+      where: {
+        id: creditCardId,
+      },
+
+      data: {
+        balance: { decrement: amountToDebit },
+      },
+    });
+
+    return creditCardDebited;
   }
 }
