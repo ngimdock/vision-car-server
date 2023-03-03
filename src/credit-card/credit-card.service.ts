@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCreditCardDto, UpdateCreditCardDto } from './dto';
-import { CreditCardNotFoundException } from './exceptions';
+import {
+  BalanceHandlerCreditCardDto,
+  CreateCreditCardDto,
+  UpdateCreditCardDto,
+} from './dto';
+import {
+  CreditCardNotFoundException,
+  InsufficientBalanceException,
+} from './exceptions';
 @Injectable()
 export class CreditCardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, createCreditCardDto: CreateCreditCardDto) {
-    const { number, name, cvc, expiry } = createCreditCardDto;
-
     try {
       const createdCreditCard = await this.prisma.creditCard.create({
         data: {
-          number,
-          name,
-          cvc,
-          expiry,
-
+          ...createCreditCardDto,
           user: {
             connect: {
               id: userId,
@@ -40,16 +41,21 @@ export class CreditCardService {
     });
   }
 
-  findOne(creditCardId: string) {
-    return this.prisma.creditCard.findUnique({
+  findOne(userId: string, creditCardId: string) {
+    return this.prisma.creditCard.findFirst({
       where: {
         id: creditCardId,
+        userId,
       },
     });
   }
 
-  async update(creditCardId: string, updateCreditCardDto: UpdateCreditCardDto) {
-    const foundCreditCard = await this.findOne(creditCardId);
+  async update(
+    userId: string,
+    creditCardId: string,
+    updateCreditCardDto: UpdateCreditCardDto,
+  ) {
+    const foundCreditCard = await this.findOne(userId, creditCardId);
 
     if (!foundCreditCard) throw new CreditCardNotFoundException();
 
@@ -63,8 +69,8 @@ export class CreditCardService {
     });
   }
 
-  async remove(creditCardId: string) {
-    const foundCreditCard = await this.findOne(creditCardId);
+  async remove(userId: string, creditCardId: string) {
+    const foundCreditCard = await this.findOne(userId, creditCardId);
 
     if (!foundCreditCard) throw new CreditCardNotFoundException();
 
@@ -73,5 +79,40 @@ export class CreditCardService {
         id: creditCardId,
       },
     });
+  }
+
+  async rechargeCreditCard(
+    userId: string,
+    creditCardId: string,
+    { amount }: BalanceHandlerCreditCardDto,
+  ) {
+    const foundCreditCard = await this.findOne(userId, creditCardId);
+
+    if (!foundCreditCard) throw new CreditCardNotFoundException();
+
+    return this.prisma.creditCard.update({
+      where: {
+        id: creditCardId,
+      },
+
+      data: {
+        balance: {
+          increment: amount,
+        },
+      },
+    });
+  }
+
+  async debitCreditCard(
+    userId: string,
+    creditCardId: string,
+    { amount }: BalanceHandlerCreditCardDto,
+  ) {
+    const foundCreditCard = await this.findOne(userId, creditCardId);
+
+    if (!foundCreditCard) throw new CreditCardNotFoundException();
+
+    if (amount > foundCreditCard.balance)
+      throw new InsufficientBalanceException();
   }
 }

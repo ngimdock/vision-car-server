@@ -3,4 +3,6 @@ export enum CreditCardRoutes {
   create = 'create',
   update = 'update',
   delete = 'delete',
+  recharge = 'recharge',
+  debit = 'debit',
 }

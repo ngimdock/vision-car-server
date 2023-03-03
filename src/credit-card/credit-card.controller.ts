@@ -8,10 +8,15 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { GetUserId } from 'src/auth/decorator';
 import { CreditCardService } from './credit-card.service';
-import { CreateCreditCardDto, UpdateCreditCardDto } from './dto';
+import {
+  BalanceHandlerCreditCardDto,
+  CreateCreditCardDto,
+  UpdateCreditCardDto,
+} from './dto';
 import { CreditCardRoutes } from './enum';
 
 @Controller(CreditCardRoutes.creditCards)
@@ -34,21 +39,63 @@ export class CreditCardController {
   }
 
   @Get(`:${CreditCardController.creditCardId}`)
-  findOne(@Param(CreditCardController.creditCardId) creditCardId: string) {
-    return this.creditCardService.findOne(creditCardId);
+  findOne(
+    @GetUserId() userId: string,
+    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    creditCardId: string,
+  ) {
+    return this.creditCardService.findOne(userId, creditCardId);
   }
 
   @Patch(`${CreditCardRoutes.update}/:${CreditCardController.creditCardId}`)
   update(
-    @Param(CreditCardController.creditCardId) creditCardId: string,
+    @GetUserId() userId: string,
+    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    creditCardId: string,
     @Body() updateCreditCardDto: UpdateCreditCardDto,
   ) {
-    return this.creditCardService.update(creditCardId, updateCreditCardDto);
+    return this.creditCardService.update(
+      userId,
+      creditCardId,
+      updateCreditCardDto,
+    );
   }
 
   @Delete(`${CreditCardRoutes.delete}/:${CreditCardController.creditCardId}`)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param(CreditCardController.creditCardId) creditCardId: string) {
-    return this.creditCardService.remove(creditCardId);
+  remove(
+    @GetUserId() userId: string,
+    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    creditCardId: string,
+  ) {
+    return this.creditCardService.remove(userId, creditCardId);
+  }
+
+  @Post(`${CreditCardRoutes.recharge}/:${CreditCardController.creditCardId}`)
+  rechargeCreditCard(
+    @GetUserId() userId: string,
+    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    creditCardId: string,
+    @Body() balanceHandlerCreditCardDto: BalanceHandlerCreditCardDto,
+  ) {
+    return this.creditCardService.rechargeCreditCard(
+      userId,
+      creditCardId,
+      balanceHandlerCreditCardDto,
+    );
+  }
+
+  @Post(`${CreditCardRoutes.debit}/:${CreditCardController.creditCardId}`)
+  debitCreditCard(
+    @GetUserId() userId: string,
+    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    creditCardId: string,
+    @Body() balanceHandlerCreditCardDto: BalanceHandlerCreditCardDto,
+  ) {
+    return this.creditCardService.debitCreditCard(
+      userId,
+      creditCardId,
+      balanceHandlerCreditCardDto,
+    );
   }
 }

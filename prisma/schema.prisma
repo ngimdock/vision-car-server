@@ -72,6 +72,8 @@ model CreditCard {
   cvc    Int
   expiry String
 
+  balance Int @default(0)
+
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

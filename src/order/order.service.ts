@@ -19,7 +19,7 @@ export class OrderService {
 
     console.log({ allBookingIds });
 
-    return allBookingIds;
+    return createOrderDto;
   }
 
   findAll() {

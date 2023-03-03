@@ -13,4 +13,8 @@ export class CreateOrderDto {
   @IsUUID()
   @IsNotEmpty()
   contry: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  creditCard: string;
 }
