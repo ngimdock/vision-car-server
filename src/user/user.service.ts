@@ -17,10 +17,17 @@ export class UserService {
         creditCards: true,
         orders: true,
         bookedCars: {
+          where: {
+            isOrdered: {
+              equals: false,
+            },
+          },
+
           select: {
             id: true,
             bookedAt: true,
             quantity: true,
+            isOrdered: true,
             car: {
               select: {
                 id: true,

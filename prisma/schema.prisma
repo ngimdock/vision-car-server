@@ -36,15 +36,15 @@ model User {
 model UserBookCar {
 
   id String @id @default(uuid())
+  quantity Int
+  bookedAt DateTime @default(now())
+  isOrdered Boolean @default(false)
   
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   carId String
   car   Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  quantity Int
-  bookedAt DateTime @default(now())
 
   orderId String?
   order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -108,6 +108,7 @@ model Order {
   id          String      @id @default(uuid())
   status      OrderStatus @default(SUBMITED)
   paymentType PaymentType
+  totalPrice Int
 
   submitedAt DateTime @default(now())
   validatedAt DateTime?

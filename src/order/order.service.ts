@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreditCard } from '@prisma/client';
+import { CarService } from 'src/car/car.service';
 import { CreditCardService } from 'src/credit-card/credit-card.service';
 import {
   CreditCardNotFoundException,
@@ -9,6 +10,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { EmptyBookingsException, OrderNotFoundException } from './exceptions';
+import { CreateOrderData } from './types';
 
 @Injectable()
 export class OrderService {
@@ -16,6 +19,7 @@ export class OrderService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly creditCardService: CreditCardService,
+    private readonly carService: CarService,
   ) {}
 
   async create(customerId: string, createOrderDto: CreateOrderDto) {
@@ -29,6 +33,7 @@ export class OrderService {
     );
 
     if (!targetCreditCard) throw new CreditCardNotFoundException();
+    if (!bookedCars.length) throw new EmptyBookingsException();
 
     const bookingsAmount = this.computeBookingsAmount(bookedCars);
 
@@ -46,8 +51,12 @@ export class OrderService {
 
       const orderCreated = await this.makeAndOrder(
         customerId,
-        createOrderDto,
+        { ...createOrderDto, bookingsAmount },
         bookingsToConnectData,
+      );
+
+      await this.carService.makeBookingsOrdered(
+        bookingsToConnectData.map((b) => b.id),
       );
 
       return orderCreated;
@@ -56,20 +65,61 @@ export class OrderService {
     return createdOrder;
   }
 
-  findAll() {
-    return `This action returns all order`;
+  findAll(customerId: string) {
+    return this.prisma.order.findMany({
+      where: {
+        customerId,
+      },
+
+      select: {
+        id: true,
+        status: true,
+        totalPrice: true,
+        paymentType: true,
+        submitedAt: true,
+        validatedAt: true,
+        deliveredAt: true,
+        deliveryContry: true,
+        creditCard: {
+          select: {
+            number: true,
+            name: true,
+          },
+        },
+        bookingsToOrder: {
+          select: {
+            quantity: true,
+            car: {
+              select: {
+                brand: true,
+                price: true,
+                images: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async findOneById(orderId: string) {
-    return orderId;
+    const foundOrder = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+    });
+
+    if (!foundOrder) throw new OrderNotFoundException();
+
+    return foundOrder;
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
     return `This action updates a #${id} order`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  remove(orderId: string) {
+    return `This action removes a #${orderId} order`;
   }
 
   private computeBookingsAmount(bookings: any[]): number {
@@ -103,14 +153,15 @@ export class OrderService {
 
   private async makeAndOrder(
     customerId: string,
-    createOrderDto: CreateOrderDto,
+    createOrderData: CreateOrderData,
     bookings: { id: string }[],
   ) {
-    const { contry, creditCard, paymentType } = createOrderDto;
+    const { contry, creditCard, paymentType, bookingsAmount } = createOrderData;
 
     const orderCreated = await this.prisma.order.create({
       data: {
         paymentType,
+        totalPrice: bookingsAmount,
         customer: {
           connect: {
             id: customerId,

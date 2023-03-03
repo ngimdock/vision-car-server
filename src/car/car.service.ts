@@ -117,6 +117,19 @@ export class CarService {
     }
   }
 
+  async makeBookingsOrdered(bookings: string[]) {
+    return this.prisma.userBookCar.updateMany({
+      where: {
+        id: {
+          in: bookings,
+        },
+      },
+      data: {
+        isOrdered: true,
+      },
+    });
+  }
+
   async findAll(paginate: PaginateDto): Promise<PaginateResultType> {
     const { offset, limit } = paginate;
 

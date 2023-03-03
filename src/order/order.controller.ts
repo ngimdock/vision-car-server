@@ -28,8 +28,8 @@ export class OrderController {
   }
 
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  findAll(@GetUserId() customerId: string) {
+    return this.orderService.findAll(customerId);
   }
 
   @Get(`${OrderRoute.find}/:${OrderController.orderId}`)
@@ -42,9 +42,9 @@ export class OrderController {
     return this.orderService.update(+id, updateOrderDto);
   }
 
-  @Delete(':id')
+  @Delete(`${OrderRoute.delete}/:${OrderController.orderId}`)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+  remove(@Param(OrderController.orderId) orderId: string) {
+    return this.orderService.remove(orderId);
   }
 }
