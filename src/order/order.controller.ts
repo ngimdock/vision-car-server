@@ -43,7 +43,7 @@ export class OrderController {
   }
 
   @Delete(`${OrderRoute.delete}/:${OrderController.orderId}`)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  // @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.remove(orderId);
   }

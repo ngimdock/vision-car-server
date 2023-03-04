@@ -37,6 +37,8 @@ export class OrderService {
 
     const bookingsAmount = this.computeBookingsAmount(bookedCars);
 
+    console.log({ bookingsAmount, balance: targetCreditCard.balance });
+
     if (bookingsAmount > targetCreditCard.balance)
       throw new InsufficientBalanceException();
 
@@ -118,8 +120,28 @@ export class OrderService {
     return `This action updates a #${id} order`;
   }
 
-  remove(orderId: string) {
-    return `This action removes a #${orderId} order`;
+  async remove(orderId: string) {
+    const { id, totalPrice, customerId, creditCardId } = await this.findOneById(
+      orderId,
+    );
+
+    const deletedOrder = await this.prisma.$transaction(async () => {
+      const deletedOrder = await this.prisma.order.delete({
+        where: {
+          id,
+        },
+      });
+
+      await this.creditCardService.rechargeCreditCard(
+        customerId,
+        creditCardId,
+        { amount: totalPrice },
+      );
+
+      return deletedOrder;
+    });
+
+    return deletedOrder;
   }
 
   private computeBookingsAmount(bookings: any[]): number {
