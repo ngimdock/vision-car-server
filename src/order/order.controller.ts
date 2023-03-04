@@ -47,4 +47,9 @@ export class OrderController {
   resubmitOrder(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.resubmitOrder(orderId);
   }
+
+  @Patch(`${OrderRoute.reject}/:${OrderController.orderId}`)
+  rejectOrder(@Param(OrderController.orderId) orderId: string) {
+    return this.orderService.rejectOrder(orderId);
+  }
 }

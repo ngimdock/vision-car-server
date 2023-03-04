@@ -12,6 +12,8 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import {
   EmptyBookingsException,
   OrderAlreadyCancelException,
+  OrderAlreadyRejectException,
+  OrderNotDellableException,
   OrderNotFoundException,
 } from './exceptions';
 import { OrderRepository } from './order.repository';
@@ -110,7 +112,10 @@ export class OrderService {
   }
 
   async cancelOrder(orderId: string) {
-    const foundOrder = await this.findOneById(orderId);
+    const foundOrder = await this.orderRepository.findOneOrderByStatus(
+      orderId,
+      OrderStatus.PENDING,
+    );
 
     const { id, totalPrice, customerId, creditCardId, status } = foundOrder;
 
@@ -133,13 +138,12 @@ export class OrderService {
   }
 
   async resubmitOrder(orderId: string) {
-    const foundOrder = await this.findOneById(orderId);
+    const foundOrder = await this.orderRepository.findOneOrderByStatus(
+      orderId,
+      OrderStatus.CANCELLED,
+    );
 
-    const { id, totalPrice, customerId, creditCardId, status, creditCard } =
-      foundOrder;
-
-    if (status !== OrderStatus.CANCELLED)
-      throw new OrderAlreadyCancelException();
+    const { id, totalPrice, customerId, creditCardId, creditCard } = foundOrder;
 
     if (totalPrice > creditCard.balance)
       throw new InsufficientBalanceException();
@@ -157,19 +161,36 @@ export class OrderService {
     return resubmittedOrder;
   }
 
+  async rejectOrder(orderId: string) {
+    const foundOrder = await this.orderRepository.findOneOrderByStatus(
+      orderId,
+      OrderStatus.PENDING,
+    );
+
+    const { id, totalPrice, customerId, creditCardId, status } = foundOrder;
+
+    if (status === OrderStatus.REJECTED)
+      throw new OrderAlreadyRejectException();
+
+    const rejectedOrder = await this.prisma.$transaction(async () => {
+      const rejectedOrder = await this.orderRepository.rejectOrder(id);
+
+      await this.creditCardService.rechargeCreditCard(
+        customerId,
+        creditCardId,
+        { amount: totalPrice },
+      );
+
+      return rejectedOrder;
+    });
+
+    return rejectedOrder;
+  }
+
   async findOneById(orderId: string) {
     const foundOrder = await this.prisma.order.findUnique({
       where: {
         id: orderId,
-      },
-
-      include: {
-        creditCard: {
-          select: {
-            name: true,
-            balance: true,
-          },
-        },
       },
     });
 
@@ -179,9 +200,10 @@ export class OrderService {
   }
 
   async remove(orderId: string) {
-    const { id, totalPrice, customerId, creditCardId } = await this.findOneById(
-      orderId,
-    );
+    const { id, status } = await this.findOneById(orderId);
+
+    if (status !== OrderStatus.CANCELLED && status !== OrderStatus.REJECTED)
+      throw new OrderNotDellableException();
 
     const deletedOrder = await this.prisma.$transaction(async () => {
       const deletedOrder = await this.prisma.order.delete({
@@ -189,12 +211,6 @@ export class OrderService {
           id,
         },
       });
-
-      await this.creditCardService.rechargeCreditCard(
-        customerId,
-        creditCardId,
-        { amount: totalPrice },
-      );
 
       return deletedOrder;
     });

@@ -173,6 +173,7 @@ enum OrderStatus {
   PENDING
   CANCELLED
   VALIDATED
+  REJECTED
   DELIVERED
 }
 

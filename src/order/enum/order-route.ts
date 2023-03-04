@@ -6,4 +6,6 @@ export enum OrderRoute {
   delete = 'delete',
   cancel = 'cancel',
   resubmit = 'resubmit',
+  reject = 'reject',
+  validate = 'validate',
 }
