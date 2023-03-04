@@ -14,7 +14,6 @@ import { CreateOrderDto } from './dto';
 
 @Controller(OrderRoute.orders)
 export class OrderController {
-  private static readonly customerId = 'customerId';
   private static readonly orderId = 'orderId';
 
   constructor(private readonly orderService: OrderService) {}
@@ -42,5 +41,10 @@ export class OrderController {
   @Patch(`${OrderRoute.cancel}/:${OrderController.orderId}`)
   cancelOrder(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.cancelOrder(orderId);
+  }
+
+  @Patch(`${OrderRoute.resubmit}/:${OrderController.orderId}`)
+  resubmitOrder(@Param(OrderController.orderId) orderId: string) {
+    return this.orderService.resubmitOrder(orderId);
   }
 }

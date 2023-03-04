@@ -107,7 +107,7 @@ model Car {
 
 model Order {
   id          String      @id @default(uuid())
-  status      OrderStatus @default(SUBMITED)
+  status      OrderStatus @default(PENDING)
   paymentType PaymentType
   totalPrice Int
 
@@ -170,8 +170,8 @@ enum Role {
 }
 
 enum OrderStatus {
+  PENDING
   CANCELLED
-  SUBMITED
   VALIDATED
   DELIVERED
 }

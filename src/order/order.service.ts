@@ -9,7 +9,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import {
   EmptyBookingsException,
   OrderAlreadyCancelException,
@@ -133,10 +132,44 @@ export class OrderService {
     return canceledOrder;
   }
 
+  async resubmitOrder(orderId: string) {
+    const foundOrder = await this.findOneById(orderId);
+
+    const { id, totalPrice, customerId, creditCardId, status, creditCard } =
+      foundOrder;
+
+    if (status !== OrderStatus.CANCELLED)
+      throw new OrderAlreadyCancelException();
+
+    if (totalPrice > creditCard.balance)
+      throw new InsufficientBalanceException();
+
+    const resubmittedOrder = await this.prisma.$transaction(async () => {
+      const resubmittedOrder = await this.orderRepository.resubmitOrder(id);
+
+      await this.creditCardService.debitCreditCard(customerId, creditCardId, {
+        amount: totalPrice,
+      });
+
+      return resubmittedOrder;
+    });
+
+    return resubmittedOrder;
+  }
+
   async findOneById(orderId: string) {
     const foundOrder = await this.prisma.order.findUnique({
       where: {
         id: orderId,
+      },
+
+      include: {
+        creditCard: {
+          select: {
+            name: true,
+            balance: true,
+          },
+        },
       },
     });
 

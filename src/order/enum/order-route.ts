@@ -5,5 +5,5 @@ export enum OrderRoute {
   find = 'find',
   delete = 'delete',
   cancel = 'cancel',
-  submitOrder = 'submit-order',
+  resubmit = 'resubmit',
 }

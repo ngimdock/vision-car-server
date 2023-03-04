@@ -12,4 +12,11 @@ export class OrderRepository {
       data: { status: OrderStatus.CANCELLED },
     });
   }
+
+  resubmitOrder(orderId: string) {
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.PENDING },
+    });
+  }
 }
