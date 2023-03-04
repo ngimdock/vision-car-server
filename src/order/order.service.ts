@@ -11,11 +11,13 @@ import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EmptyBookingsException, OrderNotFoundException } from './exceptions';
+import { OrderRepository } from './order.repository';
 import { CreateOrderData } from './types';
 
 @Injectable()
 export class OrderService {
   constructor(
+    private readonly orderRepository: OrderRepository,
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly creditCardService: CreditCardService,
@@ -102,6 +104,26 @@ export class OrderService {
         },
       },
     });
+  }
+
+  async cancelOrder(orderId: string) {
+    const foundOrder = await this.findOneById(orderId);
+
+    const { id, totalPrice, customerId, creditCardId } = foundOrder;
+
+    const canceledOrder = await this.prisma.$transaction(async () => {
+      const canceledOrder = await this.orderRepository.cancelOrder(id);
+
+      await this.creditCardService.rechargeCreditCard(
+        customerId,
+        creditCardId,
+        { amount: totalPrice },
+      );
+
+      return canceledOrder;
+    });
+
+    return canceledOrder;
   }
 
   async findOneById(orderId: string) {

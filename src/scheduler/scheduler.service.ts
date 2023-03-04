@@ -9,6 +9,18 @@ export class SchedulerService {
 
   private readonly logger = new Logger(SchedulerService.name);
 
+  /**
+   * @TODO DELETE All cancele orders after 1 day
+   * */
+
+  /**
+   * @TODO DELETE All cars with finished stock that have 0 bookings and 0 order with status 'submitted'
+   */
+
+  /**
+   * @TODO DELETE All orders with status "delivered" every new year
+   */
+
   // @Cron(CronExpression.EVERY_10_SECONDS)
   // async deleteCarsWithFinishedStock() {
   //   await this.prisma.car.deleteMany({

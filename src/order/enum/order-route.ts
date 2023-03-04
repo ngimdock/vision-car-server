@@ -4,4 +4,6 @@ export enum OrderRoute {
   create = 'create',
   find = 'find',
   delete = 'delete',
+  cancel = 'cancel',
+  submitOrder = 'submit-order',
 }

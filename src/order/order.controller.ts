@@ -47,4 +47,9 @@ export class OrderController {
   remove(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.remove(orderId);
   }
+
+  @Patch(`${OrderRoute.cancel}/:${OrderController.orderId}`)
+  cancelOrder(@Param(OrderController.orderId) orderId: string) {
+    return this.orderService.cancelOrder(orderId);
+  }
 }
