@@ -11,8 +11,6 @@ import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import {
   EmptyBookingsException,
-  OrderAlreadyCancelException,
-  OrderAlreadyRejectException,
   OrderNotDellableException,
   OrderNotFoundException,
 } from './exceptions';
@@ -117,13 +115,13 @@ export class OrderService {
       OrderStatus.PENDING,
     );
 
-    const { id, totalPrice, customerId, creditCardId, status } = foundOrder;
-
-    if (status === OrderStatus.CANCELLED)
-      throw new OrderAlreadyCancelException();
+    const { id, totalPrice, customerId, creditCardId, bookingsToOrder } =
+      foundOrder;
 
     const canceledOrder = await this.prisma.$transaction(async () => {
       const canceledOrder = await this.orderRepository.cancelOrder(id);
+
+      await this.carService.increaseCarsStocks(bookingsToOrder);
 
       await this.creditCardService.rechargeCreditCard(
         customerId,
@@ -143,7 +141,14 @@ export class OrderService {
       OrderStatus.CANCELLED,
     );
 
-    const { id, totalPrice, customerId, creditCardId, creditCard } = foundOrder;
+    const {
+      id,
+      totalPrice,
+      customerId,
+      creditCardId,
+      creditCard,
+      bookingsToOrder,
+    } = foundOrder;
 
     if (totalPrice > creditCard.balance)
       throw new InsufficientBalanceException();
@@ -154,6 +159,8 @@ export class OrderService {
       await this.creditCardService.debitCreditCard(customerId, creditCardId, {
         amount: totalPrice,
       });
+
+      await this.carService.decreaseCarsStocks(bookingsToOrder);
 
       return resubmittedOrder;
     });
@@ -167,10 +174,8 @@ export class OrderService {
       OrderStatus.PENDING,
     );
 
-    const { id, totalPrice, customerId, creditCardId, status } = foundOrder;
-
-    if (status === OrderStatus.REJECTED)
-      throw new OrderAlreadyRejectException();
+    const { id, totalPrice, customerId, creditCardId, bookingsToOrder } =
+      foundOrder;
 
     const rejectedOrder = await this.prisma.$transaction(async () => {
       const rejectedOrder = await this.orderRepository.rejectOrder(id);
@@ -180,6 +185,8 @@ export class OrderService {
         creditCardId,
         { amount: totalPrice },
       );
+
+      await this.carService.increaseCarsStocks(bookingsToOrder);
 
       return rejectedOrder;
     });

@@ -13,6 +13,7 @@ import {
   CarStockNotAvailableException,
   InvalidDataException,
 } from './exceptions';
+import { CarStockData } from './types';
 
 @Injectable()
 export class CarService {
@@ -74,7 +75,7 @@ export class CarService {
     const bookData = await this.prisma.$transaction(async () => {
       const bookData = await this.carRepository.bookACar(userId, bookACarDto);
 
-      await this.decraseCarsStocks(carId, quantity);
+      await this.decreaseCarStocks(carId, quantity);
 
       return bookData;
     });
@@ -90,7 +91,7 @@ export class CarService {
     const bookingDeleted = await this.prisma.$transaction(async () => {
       const deletedBooking = await this.carRepository.unBookACar(bookingId);
 
-      await this.increseCarsStocks(
+      await this.increaseCarStocks(
         foundedBooking.carId,
         foundedBooking.quantity,
       );
@@ -115,6 +116,36 @@ export class CarService {
     } catch (e) {
       throw new CustomHttpExeption();
     }
+  }
+
+  async increaseCarsStocks(carsData: CarStockData[]) {
+    return this.prisma.car.updateMany({
+      where: {
+        id: {
+          in: carsData.map((car) => car.carId),
+        },
+      },
+      data: {
+        availableStock: {
+          increment: carsData.find((car) => car.carId === car.carId)?.quantity,
+        },
+      },
+    });
+  }
+
+  async decreaseCarsStocks(carsData: CarStockData[]) {
+    return this.prisma.car.updateMany({
+      where: {
+        id: {
+          in: carsData.map((car) => car.carId),
+        },
+      },
+      data: {
+        availableStock: {
+          decrement: carsData.find((car) => car.carId === car.carId)?.quantity,
+        },
+      },
+    });
   }
 
   async makeBookingsOrdered(bookings: string[]) {
@@ -200,7 +231,7 @@ export class CarService {
     });
   }
 
-  private decraseCarsStocks(carId: string, quantity: number) {
+  private decreaseCarStocks(carId: string, quantity: number) {
     return this.prisma.car.update({
       where: {
         id: carId,
@@ -212,7 +243,7 @@ export class CarService {
     });
   }
 
-  private increseCarsStocks(carId: string, quantity: number) {
+  private increaseCarStocks(carId: string, quantity: number) {
     return this.prisma.car.update({
       where: {
         id: carId,
