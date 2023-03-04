@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreditCard } from '@prisma/client';
+import { CreditCard, OrderStatus } from '@prisma/client';
 import { CarService } from 'src/car/car.service';
 import { CreditCardService } from 'src/credit-card/credit-card.service';
 import {
@@ -10,7 +10,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { EmptyBookingsException, OrderNotFoundException } from './exceptions';
+import {
+  EmptyBookingsException,
+  OrderAlreadyCancelException,
+  OrderNotFoundException,
+} from './exceptions';
 import { OrderRepository } from './order.repository';
 import { CreateOrderData } from './types';
 
@@ -109,7 +113,10 @@ export class OrderService {
   async cancelOrder(orderId: string) {
     const foundOrder = await this.findOneById(orderId);
 
-    const { id, totalPrice, customerId, creditCardId } = foundOrder;
+    const { id, totalPrice, customerId, creditCardId, status } = foundOrder;
+
+    if (status === OrderStatus.CANCELLED)
+      throw new OrderAlreadyCancelException();
 
     const canceledOrder = await this.prisma.$transaction(async () => {
       const canceledOrder = await this.orderRepository.cancelOrder(id);
@@ -136,10 +143,6 @@ export class OrderService {
     if (!foundOrder) throw new OrderNotFoundException();
 
     return foundOrder;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
   }
 
   async remove(orderId: string) {
