@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ValidateOrderDto } from './dto';
 
 @Injectable()
 export class OrderRepository {
@@ -53,8 +54,43 @@ export class OrderRepository {
       },
     });
 
-    if (!foundOrder) throw new ForbiddenException('Pending order not found');
+    if (!foundOrder) throw new ForbiddenException('Order not found.');
 
     return foundOrder;
+  }
+
+  async validateOrder(orderId: string, validateOrderDto: ValidateOrderDto) {
+    const { documents, validatedAt } = validateOrderDto;
+
+    const validatedOrder = await this.prisma.order.update({
+      data: {
+        status: OrderStatus.VALIDATED,
+        validatedAt,
+        documents: {
+          createMany: {
+            data: documents,
+          },
+        },
+      },
+      where: {
+        id: orderId,
+      },
+
+      select: {
+        submitedAt: true,
+        validatedAt: true,
+        totalPrice: true,
+        status: true,
+        documents: {
+          select: {
+            type: true,
+            note: true,
+            file: true,
+          },
+        },
+      },
+    });
+
+    return validatedOrder;
   }
 }

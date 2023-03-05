@@ -12,7 +12,7 @@ import {
 import { OrderService } from './order.service';
 import { OrderRoute } from './enum';
 import { GetUserId } from 'src/auth/decorator';
-import { CreateOrderDto } from './dto';
+import { CreateOrderDto, ValidateOrderDto } from './dto';
 import { PaginateDto } from 'src/common/dto';
 
 @Controller(OrderRoute.orders)
@@ -62,5 +62,13 @@ export class OrderController {
   @Patch(`${OrderRoute.reject}/:${OrderController.orderId}`)
   rejectOrder(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.rejectOrder(orderId);
+  }
+
+  @Patch(`${OrderRoute.validate}/:${OrderController.orderId}`)
+  validateOrder(
+    @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,
+    @Body() ValidateOrderDto: ValidateOrderDto,
+  ) {
+    return this.orderService.validateOrder(orderId, ValidateOrderDto);
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreditCard, OrderStatus } from '@prisma/client';
 import { CarService } from 'src/car/car.service';
 import { PaginateDto } from 'src/common/dto';
+import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { CreditCardService } from 'src/credit-card/credit-card.service';
 import {
@@ -10,6 +11,7 @@ import {
 } from 'src/credit-card/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { ValidateOrderDto } from './dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import {
   EmptyBookingsException,
@@ -77,6 +79,7 @@ export class OrderService {
   async findAll({ offset, limit }: PaginateDto): Promise<PaginateResultType> {
     const allOrders = await this.prisma.order.findMany({
       select: {
+        id: true,
         submitedAt: true,
         totalPrice: true,
         status: true,
@@ -141,6 +144,13 @@ export class OrderService {
           select: {
             number: true,
             name: true,
+          },
+        },
+        documents: {
+          select: {
+            type: true,
+            note: true,
+            file: true,
           },
         },
         bookingsToOrder: {
@@ -273,6 +283,26 @@ export class OrderService {
     });
 
     return deletedOrder;
+  }
+
+  async validateOrder(orderId: string, validateOrderDto: ValidateOrderDto) {
+    const foundOrder = await this.orderRepository.findOneOrderByStatus(
+      orderId,
+      OrderStatus.PENDING,
+    );
+
+    try {
+      const validatedOrder = await this.orderRepository.validateOrder(
+        foundOrder.id,
+        validateOrderDto,
+      );
+
+      return validatedOrder;
+    } catch (err) {
+      console.log({ err: err.message });
+
+      throw new CustomHttpExeption();
+    }
   }
 
   private computeBookingsAmount(bookings: any[]): number {
