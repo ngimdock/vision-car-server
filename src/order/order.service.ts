@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreditCard, OrderStatus } from '@prisma/client';
 import { CarService } from 'src/car/car.service';
+import { PaginateDto } from 'src/common/dto';
+import { PaginateResultType } from 'src/common/types';
 import { CreditCardService } from 'src/credit-card/credit-card.service';
 import {
   CreditCardNotFoundException,
@@ -72,7 +74,55 @@ export class OrderService {
     return createdOrder;
   }
 
-  findAll(customerId: string) {
+  async findAll({ offset, limit }: PaginateDto): Promise<PaginateResultType> {
+    const allOrders = await this.prisma.order.findMany({
+      select: {
+        submitedAt: true,
+        totalPrice: true,
+        status: true,
+        paymentType: true,
+        deliveryContry: {
+          select: {
+            name: true,
+            tax: true,
+          },
+        },
+        customer: {
+          select: {
+            username: true,
+            email: true,
+          },
+        },
+        bookingsToOrder: {
+          select: {
+            car: {
+              select: {
+                brand: true,
+                images: true,
+                price: true,
+                availableStock: true,
+              },
+            },
+          },
+        },
+      },
+      skip: offset,
+      take: limit,
+      orderBy: {
+        submitedAt: 'desc',
+      },
+    });
+
+    const count = await this.prisma.order.count();
+
+    return {
+      count,
+      hasMore: offset + limit < count,
+      data: allOrders,
+    };
+  }
+
+  findCustomerOrders(customerId: string) {
     return this.prisma.order.findMany({
       where: {
         customerId,

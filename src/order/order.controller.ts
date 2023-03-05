@@ -6,15 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderRoute } from './enum';
 import { GetUserId } from 'src/auth/decorator';
 import { CreateOrderDto } from './dto';
+import { PaginateDto } from 'src/common/dto';
 
 @Controller(OrderRoute.orders)
 export class OrderController {
   private static readonly orderId = 'orderId';
+  private static readonly customerId = 'customerId';
 
   constructor(private readonly orderService: OrderService) {}
 
@@ -23,9 +27,16 @@ export class OrderController {
     return this.orderService.create(userId, createOrderDto);
   }
 
-  @Get()
-  findAll(@GetUserId() customerId: string) {
-    return this.orderService.findAll(customerId);
+  @Get(`${OrderRoute.all}`)
+  findAll(@Query() paginate: PaginateDto) {
+    return this.orderService.findAll(paginate);
+  }
+
+  @Get(`:${OrderController.customerId}`)
+  findCustomerOrders(
+    @Param(OrderController.customerId, ParseUUIDPipe) customerId: string,
+  ) {
+    return this.orderService.findCustomerOrders(customerId);
   }
 
   @Get(`${OrderRoute.find}/:${OrderController.orderId}`)
