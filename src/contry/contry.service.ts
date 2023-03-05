@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PaginateDto } from 'src/common/dto';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
@@ -31,7 +31,76 @@ export class ContryService {
     contryId: string,
     addShipmentContryDto: AddShipmentContryDto,
   ) {
-    return { shipperId, contryId, addShipmentContryDto };
+    const foundedContry = await this.prisma.userShipToContry.findUnique({
+      where: {
+        userId_contryId: {
+          contryId,
+          userId: shipperId,
+        },
+      },
+    });
+
+    if (foundedContry)
+      throw new ForbiddenException('This contry is already added');
+
+    try {
+      const shipperConnectedToContry =
+        await this.prisma.userShipToContry.create({
+          data: {
+            price: addShipmentContryDto.price,
+            user: {
+              connect: {
+                id: shipperId,
+              },
+            },
+            contry: {
+              connect: {
+                id: contryId,
+              },
+            },
+          },
+
+          select: {
+            contry: {
+              select: { name: true },
+            },
+            price: true,
+          },
+        });
+
+      return shipperConnectedToContry;
+    } catch (err) {
+      throw new CustomHttpExeption();
+    }
+  }
+
+  async removeUserShipmentContry(shipperId: string, contryId: string) {
+    const foundContry = await this.findOne(contryId);
+
+    const isUserConnectedToContry =
+      await this.prisma.userShipToContry.findUnique({
+        where: {
+          userId_contryId: {
+            userId: shipperId,
+            contryId: foundContry.id,
+          },
+        },
+      });
+
+    if (!isUserConnectedToContry)
+      throw new ForbiddenException(
+        "This contry is not connected to this user's shipment",
+      );
+
+    return this.prisma.userShipToContry.delete({
+      where: {
+        userId_contryId: {
+          userId: shipperId,
+
+          contryId: foundContry.id,
+        },
+      },
+    });
   }
 
   async findAll({ offset, limit }: PaginateDto): Promise<PaginateResultType> {

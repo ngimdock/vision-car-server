@@ -50,6 +50,34 @@ export class UserService {
             reductionPercent: true,
           },
         },
+
+        shipmentContry: {
+          select: {
+            price: true,
+            contry: {
+              select: {
+                name: true,
+                code: true,
+                tax: true,
+              },
+            },
+          },
+        },
+
+        ordersToShip: {
+          select: {
+            validatedAt: true,
+            deliveryContry: {
+              select: {
+                name: true,
+                code: true,
+                tax: true,
+              },
+            },
+            totalPrice: true,
+            paymentType: true,
+          },
+        },
       },
     });
 

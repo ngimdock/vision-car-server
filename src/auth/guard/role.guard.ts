@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
+import { IS_PUBLIC_ROUTE } from '../decorator';
 import { ROLES_KEY } from '../decorator/role.decorator';
 import { UserSession } from '../types';
 
@@ -23,7 +24,12 @@ export class RoleGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (!roles) return true;
+    const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_ROUTE,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!roles || isPublicRoute) return true;
 
     const request = context.switchToHttp().getRequest() as Request;
 

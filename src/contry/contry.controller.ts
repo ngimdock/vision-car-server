@@ -12,7 +12,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { GetUserId, Roles } from 'src/auth/decorator';
+import { GetUserId, PublicRoute, Roles } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
 import { ContryService } from './contry.service';
 import { AddShipmentContryDto } from './dto';
@@ -42,11 +42,22 @@ export class ContryController {
     );
   }
 
+  @Roles(Role.SHIPPER)
+  @Post(`${ContryRoute.removeShipmentContry}/:${ContryController.contryId}`)
+  @HttpCode(HttpStatus.OK)
+  removeUserShipmentContry(
+    @GetUserId() shipperId: string,
+    @Param(ContryController.contryId, ParseUUIDPipe) contryId: string,
+  ) {
+    return this.contryService.removeUserShipmentContry(shipperId, contryId);
+  }
+
   @Post(ContryRoute.create)
   create(@Body() createContryDto: CreateContryDto) {
     return this.contryService.create(createContryDto);
   }
 
+  @PublicRoute()
   @Get(ContryRoute.all)
   findAll(@Query() paginate: PaginateDto) {
     return this.contryService.findAll(paginate);
