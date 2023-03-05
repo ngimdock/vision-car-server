@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 
@@ -31,6 +32,10 @@ export class ValidateOrderDto {
   @Type(() => DocumentDataType)
   @ValidateNested({ each: true })
   documents: DocumentDataType[];
+
+  @IsUUID()
+  @IsNotEmpty()
+  shipper: string;
 
   @IsDate()
   @IsNotEmpty()
