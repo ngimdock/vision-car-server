@@ -32,12 +32,19 @@ export class OrderRepository {
     const foundOrder = await this.prisma.order.findFirst({
       where: {
         id: orderId,
+
         status: {
           equals: orderStatus,
         },
       },
 
       include: {
+        deliveryContry: {
+          select: {
+            name: true,
+            tax: true,
+          },
+        },
         creditCard: {
           select: {
             name: true,
@@ -62,6 +69,8 @@ export class OrderRepository {
   async validateOrder(orderId: string, validateOrderDto: ValidateOrderDto) {
     const { documents, validatedAt } = validateOrderDto;
 
+    // return validateOrderDto;
+
     const validatedOrder = await this.prisma.order.update({
       data: {
         status: OrderStatus.VALIDATED,
@@ -69,6 +78,11 @@ export class OrderRepository {
         documents: {
           createMany: {
             data: documents,
+          },
+        },
+        shipper: {
+          connect: {
+            id: validateOrderDto.shipper,
           },
         },
       },

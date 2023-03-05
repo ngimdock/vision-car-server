@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
@@ -150,6 +151,31 @@ export class UserService {
         username,
       },
     });
+
+    return foundUser;
+  }
+
+  async findUserByRole(userId: string, role: Role) {
+    const foundUser = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        role: role,
+      },
+
+      select: {
+        shipmentContry: {
+          select: {
+            contry: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!foundUser) throw new UserNotFoundException();
 
     return foundUser;
   }

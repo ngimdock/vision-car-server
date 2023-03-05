@@ -13,6 +13,36 @@ export class ShipperService {
       where: {
         role: Role.SHIPPER,
       },
+
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        email: true,
+        avatar: true,
+        shipmentContry: {
+          select: {
+            price: true,
+            contry: {
+              select: {
+                name: true,
+                tax: true,
+              },
+            },
+          },
+        },
+        ordersToShip: {
+          select: {
+            totalPrice: true,
+            deliveryContry: {
+              select: {
+                name: true,
+                tax: true,
+              },
+            },
+          },
+        },
+      },
       skip: offset,
       take: limit,
     });

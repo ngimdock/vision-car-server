@@ -11,9 +11,10 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderRoute } from './enum';
-import { GetUserId } from 'src/auth/decorator';
+import { GetUserId, Roles } from 'src/auth/decorator';
 import { CreateOrderDto, ValidateOrderDto } from './dto';
 import { PaginateDto } from 'src/common/dto';
+import { Role } from '@prisma/client';
 
 @Controller(OrderRoute.orders)
 export class OrderController {
@@ -27,6 +28,7 @@ export class OrderController {
     return this.orderService.create(userId, createOrderDto);
   }
 
+  @Roles(Role.ADMIN)
   @Get(`${OrderRoute.all}`)
   findAll(@Query() paginate: PaginateDto) {
     return this.orderService.findAll(paginate);
@@ -59,11 +61,13 @@ export class OrderController {
     return this.orderService.resubmitOrder(orderId);
   }
 
+  @Roles(Role.ADMIN)
   @Patch(`${OrderRoute.reject}/:${OrderController.orderId}`)
   rejectOrder(@Param(OrderController.orderId) orderId: string) {
     return this.orderService.rejectOrder(orderId);
   }
 
+  @Roles(Role.ADMIN)
   @Patch(`${OrderRoute.validate}/:${OrderController.orderId}`)
   validateOrder(
     @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,

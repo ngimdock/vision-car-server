@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreditCard, OrderStatus } from '@prisma/client';
+import { CreditCard, OrderStatus, Role } from '@prisma/client';
 import { CarService } from 'src/car/car.service';
 import { PaginateDto } from 'src/common/dto';
 import { CustomHttpExeption } from 'src/common/exceptions';
@@ -18,6 +18,7 @@ import {
   OrderNotDellableException,
   OrderNotFoundException,
 } from './exceptions';
+import { ShipperNotAvailableException } from './exceptions/shipper-not-available.exception';
 import { OrderRepository } from './order.repository';
 import { CreateOrderData } from './types';
 
@@ -98,12 +99,13 @@ export class OrderService {
         },
         bookingsToOrder: {
           select: {
+            quantity: true,
+
             car: {
               select: {
                 brand: true,
-                images: true,
                 price: true,
-                availableStock: true,
+                images: true,
               },
             },
           },
@@ -291,6 +293,13 @@ export class OrderService {
       OrderStatus.PENDING,
     );
 
+    const foundShipper = await this.isChipperAvailable(
+      validateOrderDto.shipper,
+      foundOrder.deliveryContry.name,
+    );
+
+    if (!foundShipper) throw new ShipperNotAvailableException();
+
     try {
       const validatedOrder = await this.orderRepository.validateOrder(
         foundOrder.id,
@@ -299,8 +308,6 @@ export class OrderService {
 
       return validatedOrder;
     } catch (err) {
-      console.log({ err: err.message });
-
       throw new CustomHttpExeption();
     }
   }
@@ -367,5 +374,27 @@ export class OrderService {
     });
 
     return orderCreated;
+  }
+
+  private async isChipperAvailable(shipperId: string, contryName: string) {
+    console.log({ shipperId, contryName });
+
+    const foundShipper = await this.prisma.user.findFirst({
+      where: {
+        id: shipperId,
+        role: Role.SHIPPER,
+        shipmentContry: {
+          some: {
+            contry: {
+              name: {
+                equals: contryName,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return foundShipper;
   }
 }
