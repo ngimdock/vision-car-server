@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   Query,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { Roles } from 'src/auth/decorator';
+import { GetUserId, Roles } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
 import { ContryService } from './contry.service';
+import { AddShipmentContryDto } from './dto';
 import { CreateContryDto } from './dto/create-contry.dto';
 import { UpdateContryDto } from './dto/update-contry.dto';
 import { ContryRoute } from './enum';
@@ -22,6 +26,21 @@ export class ContryController {
   private static readonly contryId = 'contryId';
 
   constructor(private readonly contryService: ContryService) {}
+
+  @Roles(Role.SHIPPER)
+  @Post(`${ContryRoute.addShipmentContry}/:${ContryController.contryId}`)
+  @HttpCode(HttpStatus.OK)
+  addUserShipmentContry(
+    @GetUserId() shipperId: string,
+    @Param(ContryController.contryId, ParseUUIDPipe) contryId: string,
+    @Body() addShipmentContryDto: AddShipmentContryDto,
+  ) {
+    return this.contryService.addUserShipmentContry(
+      shipperId,
+      contryId,
+      addShipmentContryDto,
+    );
+  }
 
   @Post(ContryRoute.create)
   create(@Body() createContryDto: CreateContryDto) {

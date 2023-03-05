@@ -3,6 +3,7 @@ import { PaginateDto } from 'src/common/dto';
 import { CustomHttpExeption } from 'src/common/exceptions';
 import { PaginateResultType } from 'src/common/types';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AddShipmentContryDto } from './dto';
 import { CreateContryDto } from './dto/create-contry.dto';
 import { UpdateContryDto } from './dto/update-contry.dto';
 import { ContryNotFoundException } from './exceptions';
@@ -23,6 +24,14 @@ export class ContryService {
     } catch (e) {
       throw new CustomHttpExeption();
     }
+  }
+
+  async addUserShipmentContry(
+    shipperId: string,
+    contryId: string,
+    addShipmentContryDto: AddShipmentContryDto,
+  ) {
+    return { shipperId, contryId, addShipmentContryDto };
   }
 
   async findAll({ offset, limit }: PaginateDto): Promise<PaginateResultType> {

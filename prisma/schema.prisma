@@ -28,9 +28,40 @@ model User {
   bookedCars    UserBookCar[]
   savedCars     Car[]   @relation("savedCars")
   publishedCars Car[]   @relation("PublishedCars")
+  ordersToShip  Order[] @relation("OrdersToShip")
+
 
   contryId String?
   contry   Contry? @relation(fields: [contryId], references: [id])
+
+  shipmentContry UserShipToContry[]
+}
+
+model UserShipToContry {
+  id String @id @default(uuid())
+  price Int
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  contryId String
+  contry   Contry @relation(fields: [contryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contryId])
+}
+
+model Contry {
+  id String @id @default(uuid())
+
+  name String @unique
+  code Int    @unique
+  tax  Int
+
+  users    User[]
+  chippers UserShipToContry[]
+  orders  Order[]
+
+  @@index([name])
 }
 
 
@@ -53,19 +84,7 @@ model UserBookCar {
   @@unique([userId, carId, bookedAt])
 }
 
-model Contry {
-  id String @id @default(uuid())
 
-  name String @unique
-  code Int    @unique
-  tax  Int
-
-  users    User[]
-  chippers Chipper[]
-  orders  Order[]
-
-  @@index([name])
-}
 
 model CreditCard {
   id     String @id @default(uuid())
@@ -125,9 +144,13 @@ model Order {
 
   creditCardId String?
   creditCard   CreditCard? @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  
 
   customerId String
   customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  shipperId String?
+  shipper   User?   @relation("OrdersToShip", fields: [shipperId], references: [id], onDelete: Cascade)
 }
 
 model OrderDetail {
@@ -141,18 +164,7 @@ model OrderDetail {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-model Chipper {
-  id   String @id @default(uuid())
-  name String @unique
-  code String @unique
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  referenceContry Contry[]
-
-  @@index([name])
-}
 
 model Document {
   id   String       @id @default(uuid())
@@ -166,6 +178,7 @@ model Document {
 
 enum Role {
   CUSTOMER
+  SHIPPER
   ADMIN
 }
 

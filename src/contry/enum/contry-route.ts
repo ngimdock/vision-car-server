@@ -4,4 +4,5 @@ export enum ContryRoute {
   create = 'create',
   update = 'update',
   delete = 'delete',
+  addShipmentContry = 'add-shipment-contry',
 }
