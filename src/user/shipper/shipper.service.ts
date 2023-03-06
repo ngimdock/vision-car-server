@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { OrderStatus, Role } from '@prisma/client';
 import { PaginateDto } from 'src/common/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -45,6 +45,16 @@ export class ShipperService {
       },
       skip: offset,
       take: limit,
+    });
+  }
+
+  async findValidatedOrderForShipper(shipperId: string, orderId: string) {
+    return this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        shipperId,
+        status: OrderStatus.VALIDATED,
+      },
     });
   }
 }

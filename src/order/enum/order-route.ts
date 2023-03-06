@@ -8,4 +8,5 @@ export enum OrderRoute {
   resubmit = 'resubmit',
   reject = 'reject',
   validate = 'validate',
+  ship = 'ship',
 }

@@ -67,7 +67,10 @@ export class UserService {
 
         ordersToShip: {
           select: {
+            id: true,
+            status: true,
             validatedAt: true,
+            shippedAt: true,
             deliveryContry: {
               select: {
                 name: true,
@@ -75,7 +78,6 @@ export class UserService {
                 tax: true,
               },
             },
-            totalPrice: true,
             paymentType: true,
           },
         },

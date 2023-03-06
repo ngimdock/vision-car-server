@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ValidateOrderDto } from './dto';
+import { ShipOrderDto, ValidateOrderDto } from './dto';
 
 @Injectable()
 export class OrderRepository {
@@ -104,5 +104,29 @@ export class OrderRepository {
     });
 
     return validatedOrder;
+  }
+
+  async shipOrder(orderId: string, shipOrderDto: ShipOrderDto) {
+    const { shippedAt } = shipOrderDto;
+
+    const shippedOrder = await this.prisma.order.update({
+      data: {
+        status: OrderStatus.SHIPPED,
+        shippedAt,
+      },
+      where: {
+        id: orderId,
+      },
+
+      select: {
+        submitedAt: true,
+        validatedAt: true,
+        shippedAt: true,
+        totalPrice: true,
+        status: true,
+      },
+    });
+
+    return shippedOrder;
   }
 }

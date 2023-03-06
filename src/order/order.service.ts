@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreditCard, OrderStatus, Role } from '@prisma/client';
 import { CarService } from 'src/car/car.service';
 import { PaginateDto } from 'src/common/dto';
@@ -10,8 +10,9 @@ import {
   InsufficientBalanceException,
 } from 'src/credit-card/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ShipperService } from 'src/user/shipper/shipper.service';
 import { UserService } from 'src/user/user.service';
-import { ValidateOrderDto } from './dto';
+import { ShipOrderDto, ValidateOrderDto } from './dto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import {
   EmptyBookingsException,
@@ -28,6 +29,7 @@ export class OrderService {
     private readonly orderRepository: OrderRepository,
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly shipperService: ShipperService,
     private readonly creditCardService: CreditCardService,
     private readonly carService: CarService,
   ) {}
@@ -140,7 +142,7 @@ export class OrderService {
         paymentType: true,
         submitedAt: true,
         validatedAt: true,
-        deliveredAt: true,
+        shippedAt: true,
         deliveryContry: {
           select: {
             name: true,
@@ -322,6 +324,27 @@ export class OrderService {
       return validatedOrder;
     } catch (err) {
       console.log({ e: err.message });
+      throw new CustomHttpExeption();
+    }
+  }
+
+  async shipOrder(
+    shipperId: string,
+    orderId: string,
+    shipOrderDto: ShipOrderDto,
+  ) {
+    const isShipperHaveAndOrderValidated =
+      await this.shipperService.findValidatedOrderForShipper(
+        shipperId,
+        orderId,
+      );
+
+    if (!isShipperHaveAndOrderValidated)
+      throw new ForbiddenException("You couldn't ship this order");
+
+    try {
+      return this.orderRepository.shipOrder(orderId, shipOrderDto);
+    } catch (err) {
       throw new CustomHttpExeption();
     }
   }

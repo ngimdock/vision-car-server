@@ -12,7 +12,7 @@ import {
 import { OrderService } from './order.service';
 import { OrderRoute } from './enum';
 import { GetUserId, Roles } from 'src/auth/decorator';
-import { CreateOrderDto, ValidateOrderDto } from './dto';
+import { CreateOrderDto, ShipOrderDto, ValidateOrderDto } from './dto';
 import { PaginateDto } from 'src/common/dto';
 import { Role } from '@prisma/client';
 
@@ -71,8 +71,18 @@ export class OrderController {
   @Patch(`${OrderRoute.validate}/:${OrderController.orderId}`)
   validateOrder(
     @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,
-    @Body() ValidateOrderDto: ValidateOrderDto,
+    @Body() validateOrderDto: ValidateOrderDto,
   ) {
-    return this.orderService.validateOrder(orderId, ValidateOrderDto);
+    return this.orderService.validateOrder(orderId, validateOrderDto);
+  }
+
+  @Roles(Role.SHIPPER)
+  @Patch(`${OrderRoute.ship}/:${OrderController.orderId}`)
+  shipOrder(
+    @GetUserId() shipperId: string,
+    @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,
+    @Body() shipOrderDto: ShipOrderDto,
+  ) {
+    return this.orderService.shipOrder(shipperId, orderId, shipOrderDto);
   }
 }
