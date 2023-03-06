@@ -1,13 +1,33 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { STOCK_FINISHED } from 'src/car/constants';
+import { CarService } from 'src/car/car.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SchedulerService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly carService: CarService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   private readonly logger = new Logger(SchedulerService.name);
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async unBookAllBookingNotOrdered() {
+    const bookingsNotOrdered = await this.prisma.userBookCar.findMany({
+      where: {
+        isOrdered: false,
+      },
+    });
+
+    await Promise.all(
+      bookingsNotOrdered.map((booking) =>
+        this.carService.unBookACar(booking.id),
+      ),
+    );
+
+    this.logger.debug('All bookings not ordered have been unbooked.');
+  }
 
   /**
    * @TODO DELETE All cancele orders after 1 day
