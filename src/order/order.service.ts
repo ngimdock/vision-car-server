@@ -141,7 +141,20 @@ export class OrderService {
         submitedAt: true,
         validatedAt: true,
         deliveredAt: true,
-        deliveryContry: true,
+        deliveryContry: {
+          select: {
+            name: true,
+            code: true,
+            tax: true,
+          },
+        },
+        shipper: {
+          select: {
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
         creditCard: {
           select: {
             number: true,
@@ -308,6 +321,7 @@ export class OrderService {
 
       return validatedOrder;
     } catch (err) {
+      console.log({ e: err.message });
       throw new CustomHttpExeption();
     }
   }

@@ -69,8 +69,6 @@ export class OrderRepository {
   async validateOrder(orderId: string, validateOrderDto: ValidateOrderDto) {
     const { documents, validatedAt } = validateOrderDto;
 
-    // return validateOrderDto;
-
     const validatedOrder = await this.prisma.order.update({
       data: {
         status: OrderStatus.VALIDATED,

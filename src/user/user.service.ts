@@ -82,6 +82,8 @@ export class UserService {
       },
     });
 
+    delete currentUser.hash;
+
     return currentUser;
   }
 
