@@ -4,6 +4,8 @@ export enum CarRoute {
   details = 'details',
   create = 'create',
   update = 'update',
+  increaseStock = 'increase-stock',
+  decreaseStock = 'decrease-stock',
   delete = 'delete',
   book = 'book',
   unBook = 'unbook',

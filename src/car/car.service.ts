@@ -231,27 +231,39 @@ export class CarService {
     });
   }
 
-  private decreaseCarStocks(carId: string, quantity: number) {
-    return this.prisma.car.update({
-      where: {
-        id: carId,
-      },
+  async decreaseCarStocks(carId: string, quantity: number) {
+    try {
+      const carWithStockDecreased = await this.prisma.car.update({
+        where: {
+          id: carId,
+        },
 
-      data: {
-        availableStock: { decrement: quantity },
-      },
-    });
+        data: {
+          availableStock: { decrement: quantity },
+        },
+      });
+
+      return carWithStockDecreased;
+    } catch (err) {
+      throw new CustomHttpExeption();
+    }
   }
 
-  private increaseCarStocks(carId: string, quantity: number) {
-    return this.prisma.car.update({
-      where: {
-        id: carId,
-      },
+  async increaseCarStocks(carId: string, quantity: number) {
+    try {
+      const carWithStockIncreased = await this.prisma.car.update({
+        where: {
+          id: carId,
+        },
 
-      data: {
-        availableStock: { increment: quantity },
-      },
-    });
+        data: {
+          availableStock: { increment: quantity },
+        },
+      });
+
+      return carWithStockIncreased;
+    } catch (err) {
+      throw new CustomHttpExeption();
+    }
   }
 }

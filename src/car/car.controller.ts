@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -14,7 +15,7 @@ import { Role } from '@prisma/client';
 import { GetUserId, Roles } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
 import { CarService } from './car.service';
-import { BookACarDto, CreateCarDto } from './dto';
+import { BookACarDto, CreateCarDto, UpdateCarStockDto } from './dto';
 import { CarRoute } from './enums';
 
 @Controller(CarRoute.cars)
@@ -75,5 +76,23 @@ export class CarController {
     @Param(CarController.carId, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.unSaveACar(userId, carId);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(`${CarRoute.increaseStock}/:${CarController.carId}`)
+  increaseCarStocks(
+    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Body() updateCarDto: UpdateCarStockDto,
+  ) {
+    return this.carService.increaseCarStocks(carId, updateCarDto.quantity);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(`${CarRoute.decreaseStock}/:${CarController.carId}`)
+  decreaseCarStocks(
+    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Body() updateCarDto: UpdateCarStockDto,
+  ) {
+    return this.carService.decreaseCarStocks(carId, updateCarDto.quantity);
   }
 }
