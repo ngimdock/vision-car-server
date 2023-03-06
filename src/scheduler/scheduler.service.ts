@@ -49,30 +49,18 @@ export class SchedulerService {
     }
   }
 
-  // async deleteAllCanceledOrders() {
-  //   this.logger.debug('All canceled orders have been deleted.');
-  // }
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async deleteAllCanceledOrders() {
+    try {
+      await this.prisma.order.deleteMany({
+        where: {
+          status: OrderStatus.CANCELLED,
+        },
+      });
 
-  /**
-   * @TODO DELETE All cancele orders after 1 day
-   * */
-
-  /**
-   * @TODO DELETE All cars with finished stock that have 0 bookings and 0 order with status 'submitted'
-   */
-
-  /**
-   * @TODO DELETE All orders with status "delivered" every new year
-   */
-
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // async deleteCarsWithFinishedStock() {
-  //   await this.prisma.car.deleteMany({
-  //     where: {
-  //       availableStock: { lte: STOCK_FINISHED },
-  //     },
-  //   });
-
-  //   this.logger.verbose('Deleted cars with finished stock');
-  // }
+      this.logger.debug('All canceled orders have been deleted.');
+    } catch (err) {
+      throw new CustomHttpExeption();
+    }
+  }
 }
