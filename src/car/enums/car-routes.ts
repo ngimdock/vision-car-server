@@ -2,6 +2,7 @@ export enum CarRoute {
   cars = 'cars',
   all = 'all',
   details = 'details',
+  uploadCarImages = 'upload-car-images',
   create = 'create',
   update = 'update',
   increaseStock = 'increase-stock',

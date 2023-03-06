@@ -12,6 +12,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { ContryModule } from './contry/contry.module';
 import { OrderModule } from './order/order.module';
 import { CreditCardModule } from './credit-card/credit-card.module';
+import { UploadsModule } from './uploads/uploads.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
@@ -40,6 +41,7 @@ import * as redisStore from 'cache-manager-redis-store';
     ContryModule,
     OrderModule,
     CreditCardModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -22,6 +22,7 @@ import { CarRoute } from './enums';
 export class CarController {
   private static readonly carId = 'carId';
   private static readonly bookingId = 'bookingId';
+  private static readonly carImages = 'carImages';
 
   constructor(private readonly carService: CarService) {}
 
