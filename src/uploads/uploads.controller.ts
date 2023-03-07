@@ -7,15 +7,16 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CAR_IMAGES, MAX_CAR_IMAGES } from './constants';
 import { UploadRoute } from './enums';
-import { fileTypesFilter } from './uploads.utils';
+import { carImageStorage, fileTypesFilter } from './uploads.utils';
 
 @Controller(UploadRoute.uploads)
 export class UploadsController {
   @Post(UploadRoute.carImages)
   @UseInterceptors(
     FilesInterceptor(CAR_IMAGES, MAX_CAR_IMAGES, {
-      dest: 'car-img-uploaded',
+      // dest: 'car-img-uploaded',
       fileFilter: fileTypesFilter,
+      storage: carImageStorage,
     }),
   )
   uploadCarsImages(@UploadedFiles() carImages: Array<Express.Multer.File>) {

@@ -8,19 +8,27 @@ import { BadRequestException } from '@nestjs/common';
 
 export const carImageStorage = diskStorage({
   destination: (req: CustomRequest, file, cb) => {
-    const folderId = getUUID();
+    const carImagesSubFolder = getUUID();
 
-    console.log({ folderId });
+    console.log({ carImagesSubFolder });
 
-    req.customData.carImagesId = folderId;
+    // req.customData.carImagesId = carImagesSubFolder;
 
-    console.log({ headers: req.headers, customData: req.customData });
+    // console.log({ headers: req.headers, customData: req.customData });
 
-    cb(null, folderId);
+    cb(null, 'car-img-uploaded');
   },
+
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+    // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+
+    const uniqueSuffix = getUUID();
+
+    const filenameWithoutExtension = file.originalname.split('.')[0];
+
+    const extension = extname(file.originalname);
+
+    cb(null, `${filenameWithoutExtension}-${uniqueSuffix}${extension}`);
   },
 });
 
