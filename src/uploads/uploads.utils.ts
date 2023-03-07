@@ -3,7 +3,11 @@ import { extname } from 'path';
 import { getUUID } from 'src/common/helpers';
 import { CustomRequest } from 'src/common/types';
 import * as path from 'path';
-import { AUTHOTIZED_IMAGES_TYPES } from './constants';
+import {
+  AUTHOTIZED_IMAGES_TYPES,
+  CAR_IMAGES_FOLDER,
+  UPLOADED,
+} from './constants';
 import { BadRequestException } from '@nestjs/common';
 
 export const carImageStorage = diskStorage({
@@ -16,7 +20,7 @@ export const carImageStorage = diskStorage({
 
     // console.log({ headers: req.headers, customData: req.customData });
 
-    cb(null, 'car-img-uploaded');
+    cb(null, `${UPLOADED}/${CAR_IMAGES_FOLDER}`);
   },
 
   filename: (req, file, cb) => {
@@ -32,7 +36,7 @@ export const carImageStorage = diskStorage({
   },
 });
 
-export const fileTypesFilter = (req, file, callback) => {
+export const imagesTypesFilter = (req, file, callback) => {
   const imageExtension = path.extname(file.originalname);
 
   const errorMessage = getErrorImagesTypes(AUTHOTIZED_IMAGES_TYPES);
