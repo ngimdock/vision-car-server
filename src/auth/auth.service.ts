@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CredentialsIncorrectException,
-  CustomHttpExeption,
-} from 'src/common/exceptions';
+import { CredentialsIncorrectException } from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
@@ -11,37 +8,34 @@ import { EmailVerificationService } from './email-verification/email-verificatio
 import { _15_MITUTES } from './constants';
 import { EmailSendRecently } from './exceptions';
 import { UserNotFoundException } from 'src/user/exceptions';
+import { UserService } from 'src/user/user.service';
+import { CreateUserData } from 'src/user/type';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly userService: UserService,
     private readonly emailVerificationService: EmailVerificationService,
   ) {}
 
   async register({ email, password }: AuthDto): Promise<UserSessionData> {
-    try {
-      const userExist = await this.prisma.user.findUnique({
-        where: {
-          email,
-        },
-      });
+    const userExist = await this.userService.findOneByEmail(email);
 
-      if (userExist) throw new CredentialsIncorrectException();
+    if (userExist) throw new CredentialsIncorrectException();
 
-      const hashedPassword = await hashPassword(password);
+    const hashedPassword = await hashPassword(password);
 
-      const newUser = await this.prisma.user.create({
-        data: {
-          email,
-          hash: hashedPassword,
-        },
-      });
+    const createUserData: CreateUserData = {
+      email,
+      hash: hashedPassword,
+    };
 
-      return { id: newUser.id, email: newUser.email, role: newUser.role };
-    } catch (err) {
-      throw new CustomHttpExeption();
-    }
+    const sessionData = await this.userService.create(createUserData);
+
+    await this.emailVerificationService.create(email);
+
+    return sessionData;
   }
 
   async login({ email, password }: AuthDto): Promise<UserSessionData> {
@@ -72,14 +66,7 @@ export class AuthService {
 
     if (lastSendEmailMinutesPassed < _15_MITUTES) throw new EmailSendRecently();
 
-    const token = this.generateSevenDigitCode().toString();
-
-    const emailTokenUpdatedData = await this.emailVerificationService.update(
-      email,
-      token,
-    );
-
-    return emailTokenUpdatedData;
+    await this.emailVerificationService.update(email);
   }
 
   destroySession(session: UserSession) {
@@ -88,13 +75,9 @@ export class AuthService {
     });
   }
 
-  timePassed(oldDate: Date, feelDate: Date) {
+  private timePassed(oldDate: Date, feelDate: Date) {
     const diff = Math.abs(oldDate.getTime() - feelDate.getTime());
     const diffMinutes = Math.ceil(diff / (1000 * 60));
     return diffMinutes;
-  }
-
-  generateSevenDigitCode() {
-    return Math.floor(1000000 + Math.random() * 9000000);
   }
 }

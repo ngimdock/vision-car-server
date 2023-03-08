@@ -3,10 +3,24 @@ import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
+import { CreateUserData } from './type';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async create(createUserData: CreateUserData) {
+    const { email, hash } = createUserData;
+
+    const newUser = await this.prisma.user.create({
+      data: {
+        email,
+        hash,
+      },
+    });
+
+    return { id: newUser.id, email: newUser.email, role: newUser.role };
+  }
 
   async findMe(userId: string) {
     const currentUser = await this.prisma.user.findUnique({
@@ -119,6 +133,14 @@ export class UserService {
     await this.prisma.user.delete({
       where: {
         id: userId,
+      },
+    });
+  }
+
+  findOneByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
       },
     });
   }
