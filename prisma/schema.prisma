@@ -179,13 +179,13 @@ model Document {
 model EmailVerification {
   email String @id
   token String @unique
-  time  DateTime @default(now())
+  time  DateTime @updatedAt
 }
 
 model PasswordReset {
   email String @id
   token String @unique
-  time  DateTime @default(now())
+  time  DateTime @updatedAt
 }
 
 enum Role {
