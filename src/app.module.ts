@@ -14,6 +14,7 @@ import { OrderModule } from './order/order.module';
 import { CreditCardModule } from './credit-card/credit-card.module';
 import { UploadsModule } from './uploads/uploads.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { EmailModule } from './emails/email.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import * as redisStore from 'cache-manager-redis-store';
     OrderModule,
     CreditCardModule,
     UploadsModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [

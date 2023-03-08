@@ -176,6 +176,18 @@ model Document {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
+model EmailVerification {
+  email String @id
+  token String @unique
+  time  DateTime @default(now())
+}
+
+model PasswordReset {
+  email String @id
+  token String @unique
+  time  DateTime @default(now())
+}
+
 enum Role {
   CUSTOMER
   SHIPPER
