@@ -5,7 +5,7 @@ import { ReceiverEmailData } from './types';
 export abstract class EmailService {
   abstract sendEmailWelcome(receiverEmailData: ReceiverEmailData): Promise<any>;
 
-  abstract sendEmailVerification(
+  abstract resendEmailVerification(
     receiverEmailData: ReceiverEmailData,
   ): Promise<any>;
 }

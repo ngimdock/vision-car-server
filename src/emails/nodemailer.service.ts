@@ -19,7 +19,7 @@ export class NodeMailerService implements EmailService {
     return transporter.sendMail(options);
   }
 
-  async sendEmailVerification({
+  async resendEmailVerification({
     email,
     username,
     token,

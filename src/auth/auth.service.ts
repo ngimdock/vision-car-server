@@ -103,11 +103,12 @@ export class AuthService {
 
     const lastSendEmailTimePassed = this.timePassed(emailData.time, new Date());
 
-    if (lastSendEmailTimePassed < 5) throw new EmailSendRecentlyException();
+    if (lastSendEmailTimePassed < _15_MITUTES)
+      throw new EmailSendRecentlyException();
 
     const { token } = await this.emailVerificationService.update(email);
 
-    await this.emailService.sendEmailVerification({ email, token });
+    await this.emailService.resendEmailVerification({ email, token });
   }
 
   destroySession(session: UserSession) {
