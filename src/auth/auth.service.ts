@@ -14,8 +14,6 @@ import { UserNotFoundException } from 'src/user/exceptions';
 import { UserService } from 'src/user/user.service';
 import { CreateUserData } from 'src/user/type';
 import { EmailService } from 'src/emails/email.service';
-import { getEmailWelcomeOptions, transporter } from 'src/emails/config';
-import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
@@ -26,15 +24,7 @@ export class AuthService {
     private readonly emailService: EmailService,
   ) {}
 
-  async register({ email, password }: AuthDto) {
-    const resultEmail = await this.emailService.sendEmailWelcome({
-      email,
-      token: '123456',
-    });
-
-    return resultEmail;
-
-    /**----------------------- */
+  async register({ email, password }: AuthDto): Promise<UserSessionData> {
     const userExist = await this.userService.findOneByEmail(email);
 
     if (userExist) throw new CredentialsIncorrectException();
