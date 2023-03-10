@@ -9,7 +9,11 @@ import { hashPassword, verifyPassword } from '../common/helpers';
 import { UserSession, UserSessionData } from './types';
 import { EmailVerificationService } from './email-verification/email-verification.service';
 import { _15_MITUTES, _2_HOURS } from './constants';
-import { EmailSendRecently, TokenExpiredException } from './exceptions';
+import {
+  EmailAlreadyCertified,
+  EmailSendRecentlyException,
+  TokenExpiredException,
+} from './exceptions';
 import { UserNotFoundException } from 'src/user/exceptions';
 import { UserService } from 'src/user/user.service';
 import { CreateUserData } from 'src/user/type';
@@ -92,19 +96,18 @@ export class AuthService {
     return user;
   }
 
-  async changeEmailToken(email: string) {
+  async resendEmailVerification(email: string) {
     const emailData = await this.emailVerificationService.findOneByEmail(email);
 
-    if (!emailData) throw new UserNotFoundException();
+    if (!emailData) throw new EmailAlreadyCertified();
 
-    const lastSendEmailMinutesPassed = this.timePassed(
-      emailData.time,
-      new Date(),
-    );
+    const lastSendEmailTimePassed = this.timePassed(emailData.time, new Date());
 
-    if (lastSendEmailMinutesPassed < _15_MITUTES) throw new EmailSendRecently();
+    if (lastSendEmailTimePassed < 5) throw new EmailSendRecentlyException();
 
-    await this.emailVerificationService.update(email);
+    const { token } = await this.emailVerificationService.update(email);
+
+    await this.emailService.sendEmailVerification({ email, token });
   }
 
   destroySession(session: UserSession) {

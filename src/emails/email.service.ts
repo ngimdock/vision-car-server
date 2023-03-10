@@ -6,7 +6,6 @@ export abstract class EmailService {
   abstract sendEmailWelcome(receiverEmailData: ReceiverEmailData): Promise<any>;
 
   abstract sendEmailVerification(
-    receieverEmail: string,
-    token: string,
+    receiverEmailData: ReceiverEmailData,
   ): Promise<any>;
 }

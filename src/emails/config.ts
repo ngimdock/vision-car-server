@@ -53,8 +53,11 @@ export const getEmailWelcomeOptions = ({
           link: `${SERVER_APP_HOST}:${SERVER_APP_PORT}/auth/email/verify/${token}`,
         },
       },
-      outro:
-        "Need help, or have questions? Just reply to this email, we'd love to help.",
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
     },
   };
 
@@ -68,14 +71,37 @@ export const getEmailWelcomeOptions = ({
   };
 };
 
-export const getEmailVerificationOptions = (
-  receieverEmail: string,
-  token: string,
-): EmailOptionsType => ({
-  from: '<ngimdockzemfack@gmail.com>',
-  to: receieverEmail,
-  subject: 'Verify your email',
-  text: 'Hello verify your email by clicking on the link below',
-  html: `Hi! <br><br> This is the link.<br><br>
-    <a href='http://localhost:3333/auth/email/verify/${token}'>Click here to activate your account</a>`,
-});
+export const getEmailVerificationOptions = ({
+  email,
+  username,
+  token,
+}: ReceiverEmailData): EmailOptionsType => {
+  const template = {
+    body: {
+      name: username || '',
+      intro: `To ensure that you receive all important updates and information related to our services, we need to verify your email account.`,
+      action: {
+        instructions: `Please click on the verification link provided below to complete the process:`,
+        button: {
+          color: '#22BC66',
+          text: 'Verify your email',
+          link: `${SERVER_APP_HOST}:${SERVER_APP_PORT}/auth/email/verify/${token}`,
+        },
+      },
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const welcomeEmailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Please Verify Your Email Account`,
+    html: welcomeEmailTemplate,
+  };
+};

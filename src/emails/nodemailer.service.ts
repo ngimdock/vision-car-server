@@ -19,11 +19,12 @@ export class NodeMailerService implements EmailService {
     return transporter.sendMail(options);
   }
 
-  async sendEmailVerification(
-    receieverEmail: string,
-    token: string,
-  ): Promise<void> {
-    const options = getEmailVerificationOptions(receieverEmail, token);
+  async sendEmailVerification({
+    email,
+    username,
+    token,
+  }: ReceiverEmailData): Promise<void> {
+    const options = getEmailVerificationOptions({ email, username, token });
 
     return transporter.sendMail(options);
   }

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './decorator';
-import { AuthDto } from './dto';
+import { AuthDto, EmailDto } from './dto';
 import { AuthRoute } from './enums';
 import { UserSession, UserSessionData } from './types';
 
@@ -41,6 +41,12 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Session() session: UserSession) {
     this.authService.destroySession(session);
+  }
+
+  @PublicRoute()
+  @Post(AuthRoute.resendEmailVerification)
+  async resendEmailVerification(@Body() emailDto: EmailDto) {
+    return this.authService.resendEmailVerification(emailDto.email);
   }
 
   @PublicRoute()
