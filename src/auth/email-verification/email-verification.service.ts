@@ -5,9 +5,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class EmailVerificationService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findOne(email: string) {
+  findOneByEmail(email: string) {
     return this.prisma.emailVerification.findUnique({
       where: { email },
+    });
+  }
+
+  findOneByToken(token: string) {
+    return this.prisma.emailVerification.findUnique({
+      where: { token },
     });
   }
 

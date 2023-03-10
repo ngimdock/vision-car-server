@@ -16,8 +16,6 @@ export class NodeMailerService implements EmailService {
   }: ReceiverEmailData): Promise<void> {
     const options = getEmailWelcomeOptions({ email, username, token });
 
-    // const transporter = await getTransporter();
-
     return transporter.sendMail(options);
   }
 
@@ -26,8 +24,6 @@ export class NodeMailerService implements EmailService {
     token: string,
   ): Promise<void> {
     const options = getEmailVerificationOptions(receieverEmail, token);
-
-    // const transporter = await getTransporter();
 
     return transporter.sendMail(options);
   }

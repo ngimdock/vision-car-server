@@ -8,8 +8,8 @@ import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
 import { UserSession, UserSessionData } from './types';
 import { EmailVerificationService } from './email-verification/email-verification.service';
-import { _15_MITUTES } from './constants';
-import { EmailSendRecently } from './exceptions';
+import { _15_MITUTES, _2_HOURS } from './constants';
+import { EmailSendRecently, TokenExpiredException } from './exceptions';
 import { UserNotFoundException } from 'src/user/exceptions';
 import { UserService } from 'src/user/user.service';
 import { CreateUserData } from 'src/user/type';
@@ -47,7 +47,6 @@ export class AuthService {
 
       return sessionData;
     } catch (err) {
-      console.log({ error: err.message });
       throw new CustomHttpExeption();
     }
   }
@@ -68,8 +67,33 @@ export class AuthService {
     return { id: foundUser.id, email: foundUser.email, role: foundUser.role };
   }
 
+  async verifyEmail(token: string): Promise<void> {
+    const emailData = await this.emailVerificationService.findOneByToken(token);
+
+    if (!emailData) throw new UserNotFoundException();
+
+    const timePassedWhileSendingToken = this.timePassed(
+      emailData.time,
+      new Date(),
+    );
+
+    if (timePassedWhileSendingToken > _2_HOURS)
+      throw new TokenExpiredException();
+
+    const user = await this.prisma.$transaction(async () => {
+      const [user] = await Promise.all([
+        this.userService.verifiedEmail(emailData.email),
+        this.emailVerificationService.remove(emailData.email),
+      ]);
+
+      return user;
+    });
+
+    return user;
+  }
+
   async changeEmailToken(email: string) {
-    const emailData = await this.emailVerificationService.findOne(email);
+    const emailData = await this.emailVerificationService.findOneByEmail(email);
 
     if (!emailData) throw new UserNotFoundException();
 

@@ -3,7 +3,7 @@ export enum AuthRoute {
   register = 'register',
   login = 'login',
   logout = 'logout',
-  confirmEmail = 'confirm-email',
-  changeEmail = 'change-email',
-  resetPassword = 'reset-password',
+  verifyEmail = 'email/verify',
+  changeEmail = 'email/change',
+  resetPassword = 'password/reset',
 }

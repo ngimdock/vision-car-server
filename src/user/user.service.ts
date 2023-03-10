@@ -171,6 +171,19 @@ export class UserService {
     return foundUser;
   }
 
+  async verifiedEmail(email: string) {
+    await this.findOneByEmail(email);
+
+    await this.prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        emailVerified: true,
+      },
+    });
+  }
+
   private async findOneUserByUsername(username: string) {
     const foundUser = await this.prisma.user.findUnique({
       where: {

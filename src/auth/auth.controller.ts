@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Session,
 } from '@nestjs/common';
@@ -14,6 +16,8 @@ import { UserSession, UserSessionData } from './types';
 
 @Controller(AuthRoute.auth)
 export class AuthController {
+  private static readonly token = 'token';
+
   constructor(private readonly authService: AuthService) {}
 
   @PublicRoute()
@@ -39,17 +43,17 @@ export class AuthController {
     this.authService.destroySession(session);
   }
 
+  @PublicRoute()
+  @Get(`${AuthRoute.verifyEmail}/:${AuthController.token}`)
+  async verifyEmail(@Param(AuthController.token) token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
   private serializeSession(
     session: UserSession,
     userSessionData: UserSessionData,
   ) {
     session.user = { ...userSessionData };
-  }
-
-  /**@TODO */
-  @Post(AuthRoute.confirmEmail)
-  async confirmEmail() {
-    return { message: 'Email confirmed' };
   }
 
   /**@TODO */
