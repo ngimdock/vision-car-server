@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { generateSevenDigitCode } from 'src/common/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class EmailVerificationService {
   }
 
   async create(email: string) {
-    const token = this.generateSevenDigitCode().toString();
+    const token = generateSevenDigitCode().toString();
 
     return this.prisma.emailVerification.create({
       data: { email, token },
@@ -32,15 +33,11 @@ export class EmailVerificationService {
   }
 
   update(email: string) {
-    const token = this.generateSevenDigitCode().toString();
+    const token = generateSevenDigitCode().toString();
 
     return this.prisma.emailVerification.update({
       where: { email },
       data: { token },
     });
-  }
-
-  private generateSevenDigitCode() {
-    return Math.floor(1000000 + Math.random() * 9000000);
   }
 }

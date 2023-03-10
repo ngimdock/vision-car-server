@@ -12,14 +12,6 @@ const COMPANY_EMAIL_PASSWORD = process.env.COMPANY_EMAIL_PASSWORD;
 const SERVER_APP_HOST = process.env.SERVER_APP_HOST;
 const SERVER_APP_PORT = process.env.SERVER_APP_PORT;
 
-console.log({
-  COMPANY_NAME,
-  COMPANY_EMAIL,
-  COMPANY_EMAIL_PASSWORD,
-  SERVER_APP_HOST,
-  SERVER_APP_PORT,
-});
-
 export const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

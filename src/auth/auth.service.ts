@@ -111,6 +111,14 @@ export class AuthService {
     await this.emailService.resendEmailVerification({ email, token });
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.userService.findOneByEmail(email);
+
+    if (!user) throw new UserNotFoundException();
+
+    //
+  }
+
   destroySession(session: UserSession) {
     session.destroy((err) => {
       if (err) throw err;

@@ -55,11 +55,10 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  private serializeSession(
-    session: UserSession,
-    userSessionData: UserSessionData,
-  ) {
-    session.user = { ...userSessionData };
+  @PublicRoute()
+  @Post(AuthRoute.forgotPassword)
+  async forgotPassword(@Body() emailDto: EmailDto) {
+    return this.authService.forgotPassword(emailDto.email);
   }
 
   /**@TODO */
@@ -72,5 +71,12 @@ export class AuthController {
   @Post(AuthRoute.resetPassword)
   async resetPassword() {
     return { message: 'Password reset' };
+  }
+
+  private serializeSession(
+    session: UserSession,
+    userSessionData: UserSessionData,
+  ) {
+    session.user = { ...userSessionData };
   }
 }

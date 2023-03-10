@@ -4,11 +4,12 @@ import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { EmailVerificationService } from './email-verification/email-verification.service';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 
 @Module({
   imports: [EmailModule, forwardRef(() => UserModule)],
   controllers: [AuthController],
-  providers: [AuthService, EmailVerificationService],
+  providers: [AuthService, EmailVerificationService, ForgotPasswordService],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -183,7 +183,7 @@ model EmailVerification {
   time  DateTime @updatedAt
 }
 
-model PasswordReset {
+model PasswordForgoten {
   email String @id
   token String @unique
   time  DateTime @updatedAt
