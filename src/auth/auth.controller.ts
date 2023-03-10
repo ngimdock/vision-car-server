@@ -21,7 +21,9 @@ export class AuthController {
   async register(@Body() authDto: AuthDto, @Session() session: UserSession) {
     const userSessionData = await this.authService.register(authDto);
 
-    this.serializeSession(session, userSessionData);
+    return userSessionData;
+
+    // this.serializeSession(session, userSessionData);
   }
 
   @PublicRoute()

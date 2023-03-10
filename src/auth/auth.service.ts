@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CredentialsIncorrectException } from 'src/common/exceptions';
+import {
+  CredentialsIncorrectException,
+  CustomHttpExeption,
+} from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
@@ -10,6 +13,9 @@ import { EmailSendRecently } from './exceptions';
 import { UserNotFoundException } from 'src/user/exceptions';
 import { UserService } from 'src/user/user.service';
 import { CreateUserData } from 'src/user/type';
+import { EmailService } from 'src/emails/email.service';
+import { getEmailWelcomeOptions, transporter } from 'src/emails/config';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
@@ -17,25 +23,43 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly emailVerificationService: EmailVerificationService,
+    private readonly emailService: EmailService,
   ) {}
 
-  async register({ email, password }: AuthDto): Promise<UserSessionData> {
+  async register({ email, password }: AuthDto) {
+    const resultEmail = await this.emailService.sendEmailWelcome({
+      email,
+      token: '123456',
+    });
+
+    return resultEmail;
+
+    /**----------------------- */
     const userExist = await this.userService.findOneByEmail(email);
 
     if (userExist) throw new CredentialsIncorrectException();
 
-    const hashedPassword = await hashPassword(password);
+    const hash = await hashPassword(password);
 
-    const createUserData: CreateUserData = {
-      email,
-      hash: hashedPassword,
-    };
+    const createUserData: CreateUserData = { email, hash };
 
-    const sessionData = await this.userService.create(createUserData);
+    try {
+      const sessionData = await this.prisma.$transaction(async () => {
+        const [sessionData, { token }] = await Promise.all([
+          this.userService.create(createUserData),
+          this.emailVerificationService.create(email),
+        ]);
 
-    await this.emailVerificationService.create(email);
+        await this.emailService.sendEmailWelcome({ email, token });
 
-    return sessionData;
+        return sessionData;
+      });
+
+      return sessionData;
+    } catch (err) {
+      console.log({ error: err.message });
+      throw new CustomHttpExeption();
+    }
   }
 
   async login({ email, password }: AuthDto): Promise<UserSessionData> {
