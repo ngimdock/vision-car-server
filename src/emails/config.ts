@@ -2,6 +2,8 @@ import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 import * as Mailgen from 'mailgen';
 import { EmailOptionsType, ReceiverEmailData } from './types';
+import { _15_MITUTES } from 'src/auth/constants';
+import { AuthRoute } from 'src/auth/enums';
 
 dotenv.config();
 
@@ -94,6 +96,41 @@ export const getEmailVerificationOptions = ({
     from: COMPANY_EMAIL,
     to: email,
     subject: `Please Verify Your Email Account`,
+    html: welcomeEmailTemplate,
+  };
+};
+
+export const getEmailToResetPasswordOptions = ({
+  email,
+  username,
+  token,
+}: ReceiverEmailData): EmailOptionsType => {
+  const template = {
+    body: {
+      name: username || '',
+      intro: `Click on this button to reset your password.`,
+      action: {
+        instructions: `This reset password link will expire in ${_15_MITUTES} minutes.`,
+        button: {
+          color: '#22BC66',
+          text: 'Reset your password',
+          link: `${SERVER_APP_HOST}:${SERVER_APP_PORT}/${AuthRoute.auth}/${AuthRoute.resetPassword}/${token}`,
+        },
+      },
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const welcomeEmailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Reset your password`,
     html: welcomeEmailTemplate,
   };
 };

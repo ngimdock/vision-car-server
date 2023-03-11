@@ -8,6 +8,7 @@ import { AuthDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
 import { UserSession, UserSessionData } from './types';
 import { EmailVerificationService } from './email-verification/email-verification.service';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { _15_MITUTES, _2_HOURS } from './constants';
 import {
   EmailAlreadyCertified,
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly emailVerificationService: EmailVerificationService,
+    private readonly forgotPasswordService: ForgotPasswordService,
     private readonly emailService: EmailService,
   ) {}
 
@@ -111,12 +113,31 @@ export class AuthService {
     await this.emailService.resendEmailVerification({ email, token });
   }
 
-  async forgotPassword(email: string) {
-    const user = await this.userService.findOneByEmail(email);
+  async sendEmailToResetPassword(email: string) {
+    const [userExist, userPassData] = await Promise.all([
+      this.userService.findOneByEmail(email),
+      this.forgotPasswordService.findOneByEmail(email),
+    ]);
 
-    if (!user) throw new UserNotFoundException();
+    if (!userExist) throw new UserNotFoundException();
 
-    //
+    if (!userPassData) {
+      const { token } = await this.forgotPasswordService.create(email);
+
+      return this.emailService.sendEmailToResetPassword({ email, token });
+    }
+
+    const timePassedWhileSendingToken = this.timePassed(
+      userPassData.time,
+      new Date(),
+    );
+
+    if (timePassedWhileSendingToken < _15_MITUTES)
+      throw new EmailSendRecentlyException();
+
+    const { token } = await this.forgotPasswordService.updateToken(email);
+
+    return this.emailService.sendEmailToResetPassword({ email, token });
   }
 
   destroySession(session: UserSession) {

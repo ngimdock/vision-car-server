@@ -6,6 +6,6 @@ export enum AuthRoute {
   verifyEmail = 'email/verify',
   changeEmail = 'email/change',
   resendEmailVerification = 'email/resend/verification',
-  forgotPassword = 'password/forgot',
+  sendEmailToResetPassword = 'password/send/reset',
   resetPassword = 'password/reset',
 }

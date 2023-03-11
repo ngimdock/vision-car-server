@@ -7,5 +7,9 @@ export abstract class EmailService {
 
   abstract resendEmailVerification(
     receiverEmailData: ReceiverEmailData,
-  ): Promise<any>;
+  ): Promise<void>;
+
+  abstract sendEmailToResetPassword(
+    receiverEmailData: ReceiverEmailData,
+  ): Promise<void>;
 }

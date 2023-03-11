@@ -56,21 +56,21 @@ export class AuthController {
   }
 
   @PublicRoute()
-  @Post(AuthRoute.forgotPassword)
-  async forgotPassword(@Body() emailDto: EmailDto) {
-    return this.authService.forgotPassword(emailDto.email);
+  @Post(AuthRoute.sendEmailToResetPassword)
+  async sendEmailToResetPassword(@Body() emailDto: EmailDto) {
+    return this.authService.sendEmailToResetPassword(emailDto.email);
+  }
+
+  @PublicRoute()
+  @Get(`${AuthRoute.resetPassword}/:${AuthController.token}`)
+  async resetPassword(@Param(AuthController.token) token: string) {
+    return { message: 'Password reset', token };
   }
 
   /**@TODO */
   @Post(AuthRoute.changeEmail)
   async changeEmail() {
     return { message: 'Email changed' };
-  }
-
-  /**@TODO */
-  @Post(AuthRoute.resetPassword)
-  async resetPassword() {
-    return { message: 'Password reset' };
   }
 
   private serializeSession(

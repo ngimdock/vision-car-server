@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  getEmailToResetPasswordOptions,
   getEmailVerificationOptions,
   getEmailWelcomeOptions,
   transporter,
@@ -16,7 +17,7 @@ export class NodeMailerService implements EmailService {
   }: ReceiverEmailData): Promise<void> {
     const options = getEmailWelcomeOptions({ email, username, token });
 
-    return transporter.sendMail(options);
+    await transporter.sendMail(options);
   }
 
   async resendEmailVerification({
@@ -26,6 +27,14 @@ export class NodeMailerService implements EmailService {
   }: ReceiverEmailData): Promise<void> {
     const options = getEmailVerificationOptions({ email, username, token });
 
-    return transporter.sendMail(options);
+    await transporter.sendMail(options);
+  }
+
+  async sendEmailToResetPassword(
+    receiverEmailData: ReceiverEmailData,
+  ): Promise<any> {
+    const options = getEmailToResetPasswordOptions(receiverEmailData);
+
+    await transporter.sendMail(options);
   }
 }
