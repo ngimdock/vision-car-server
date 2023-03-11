@@ -4,7 +4,7 @@ import {
   CustomHttpExeption,
 } from 'src/common/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto';
+import { AuthDto, ResetPasswordDto } from './dto';
 import { hashPassword, verifyPassword } from '../common/helpers';
 import { UserSession, UserSessionData } from './types';
 import { EmailVerificationService } from './email-verification/email-verification.service';
@@ -138,6 +138,35 @@ export class AuthService {
     const { token } = await this.forgotPasswordService.updateToken(email);
 
     return this.emailService.sendEmailToResetPassword({ email, token });
+  }
+
+  async resetPassword(
+    token: string,
+    { newPassword }: ResetPasswordDto,
+    session: UserSession,
+  ) {
+    const userPassData = await this.forgotPasswordService.findOneByToken(token);
+
+    if (!userPassData) throw new UserNotFoundException();
+
+    const { email, time } = userPassData;
+
+    const timePassedWhileSendingToken = this.timePassed(time, new Date());
+
+    if (timePassedWhileSendingToken > _2_HOURS)
+      throw new TokenExpiredException();
+
+    const hash = await hashPassword(newPassword);
+
+    await this.prisma.$transaction(async () => {
+      await Promise.all([
+        this.userService.updatePassword(email, hash),
+        this.forgotPasswordService.remove(email),
+        this.emailService.sendEmailWhilePasswordReseted({ email }),
+      ]);
+    });
+
+    this.destroySession(session);
   }
 
   destroySession(session: UserSession) {

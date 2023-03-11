@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './decorator';
-import { AuthDto, EmailDto } from './dto';
+import { AuthDto, EmailDto, ResetPasswordDto } from './dto';
 import { AuthRoute } from './enums';
 import { UserSession, UserSessionData } from './types';
 
@@ -45,6 +45,7 @@ export class AuthController {
 
   @PublicRoute()
   @Post(AuthRoute.resendEmailVerification)
+  @HttpCode(HttpStatus.OK)
   async resendEmailVerification(@Body() emailDto: EmailDto) {
     return this.authService.resendEmailVerification(emailDto.email);
   }
@@ -57,14 +58,20 @@ export class AuthController {
 
   @PublicRoute()
   @Post(AuthRoute.sendEmailToResetPassword)
+  @HttpCode(HttpStatus.OK)
   async sendEmailToResetPassword(@Body() emailDto: EmailDto) {
     return this.authService.sendEmailToResetPassword(emailDto.email);
   }
 
   @PublicRoute()
-  @Get(`${AuthRoute.resetPassword}/:${AuthController.token}`)
-  async resetPassword(@Param(AuthController.token) token: string) {
-    return { message: 'Password reset', token };
+  @Post(`${AuthRoute.resetPassword}/:${AuthController.token}`)
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Param(AuthController.token) token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Session() session: UserSession,
+  ) {
+    return this.authService.resetPassword(token, resetPasswordDto, session);
   }
 
   /**@TODO */

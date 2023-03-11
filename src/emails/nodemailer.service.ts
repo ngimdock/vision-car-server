@@ -3,6 +3,7 @@ import {
   getEmailToResetPasswordOptions,
   getEmailVerificationOptions,
   getEmailWelcomeOptions,
+  getEmailWhilePasswodResetedOptions,
   transporter,
 } from './config';
 import { EmailService } from './email.service';
@@ -32,9 +33,17 @@ export class NodeMailerService implements EmailService {
 
   async sendEmailToResetPassword(
     receiverEmailData: ReceiverEmailData,
-  ): Promise<any> {
+  ): Promise<void> {
     const options = getEmailToResetPasswordOptions(receiverEmailData);
 
     await transporter.sendMail(options);
+  }
+
+  sendEmailWhilePasswordReseted(
+    receiverEmailData: ReceiverEmailData,
+  ): Promise<void> {
+    const options = getEmailWhilePasswodResetedOptions(receiverEmailData);
+
+    return transporter.sendMail(options);
   }
 }

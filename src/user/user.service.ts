@@ -218,4 +218,15 @@ export class UserService {
 
     return foundUser;
   }
+
+  updatePassword(email: string, newHash: string) {
+    return this.prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        hash: newHash,
+      },
+    });
+  }
 }

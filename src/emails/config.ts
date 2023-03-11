@@ -110,7 +110,7 @@ export const getEmailToResetPasswordOptions = ({
       name: username || '',
       intro: `Click on this button to reset your password.`,
       action: {
-        instructions: `This reset password link will expire in ${_15_MITUTES} minutes.`,
+        instructions: `This reset password link will expire in 2 hour.`,
         button: {
           color: '#22BC66',
           text: 'Reset your password',
@@ -131,6 +131,42 @@ export const getEmailToResetPasswordOptions = ({
     from: COMPANY_EMAIL,
     to: email,
     subject: `Reset your password`,
+    html: welcomeEmailTemplate,
+  };
+};
+
+export const getEmailWhilePasswodResetedOptions = ({
+  email,
+  username,
+}: ReceiverEmailData): EmailOptionsType => {
+  const template = {
+    body: {
+      name: username || '',
+      intro: `Your password has been reset successfully, use your new password to login.`,
+      action: {
+        instructions: `If you did this action, you can safely ignore this email. Otherwise, contact us immediately.`,
+        button: {
+          color: '#22BC66',
+          text: 'The login page',
+          link: `${SERVER_APP_HOST}:${SERVER_APP_PORT}/${AuthRoute.auth}/${AuthRoute.login}`,
+        },
+      },
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  console.log({ rrEmail: email });
+
+  const welcomeEmailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Your password has been reset`,
     html: welcomeEmailTemplate,
   };
 };
