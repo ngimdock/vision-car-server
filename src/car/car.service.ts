@@ -200,6 +200,22 @@ export class CarService {
     };
   }
 
+  async findManyByIds(carIds: string[]) {
+    return await this.prisma.car.findMany({
+      where: {
+        id: {
+          in: carIds,
+        },
+      },
+
+      select: {
+        id: true,
+        brand: true,
+        price: true,
+      },
+    });
+  }
+
   async findOneById(cardId: string) {
     const car = await this.prisma.car.findUnique({
       where: {

@@ -1109,6 +1109,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
   integrity sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==
 
+"@types/node@>=8.1.0":
+  version "18.15.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.15.1.tgz#41dc2bf78e8085a250d4670d95edb7fba621dd29"
+  integrity sha512-U2TWca8AeHSmbpi314QBESRk7oPjSZjDsR+c+H4ECC1l+kFgpZf8Ydhv3SJpPy51VyZHHqxlb6mTTqYNNRVAIw==
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -5018,6 +5023,14 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-3.1.1.tgz#31f1281b3832630434831c310c01cccda8cbe006"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
+
+stripe@^11.14.0:
+  version "11.14.0"
+  resolved "https://registry.yarnpkg.com/stripe/-/stripe-11.14.0.tgz#3e755921f69267a2a653e61d8ac37fe853740421"
+  integrity sha512-EqIMCKkfkewf3eLJo0fopDy/EN2UF6q7L3NEycwThjZRUj8HFz3BpcEDjCITfNJ04ozrAmZNqFaiW46YG4KUtw==
+  dependencies:
+    "@types/node" ">=8.1.0"
+    qs "^6.11.0"
 
 superagent@^8.0.5:
   version "8.0.9"

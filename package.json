@@ -57,6 +57,7 @@
     "redis": "^4.6.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5",
+    "stripe": "^11.14.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
