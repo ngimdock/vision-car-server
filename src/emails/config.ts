@@ -1,8 +1,11 @@
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 import * as Mailgen from 'mailgen';
-import { EmailOptionsType, ReceiverEmailData } from './types';
-import { _15_MITUTES } from 'src/auth/constants';
+import {
+  CarOrderedEmailData,
+  EmailOptionsType,
+  ReceiverEmailData,
+} from './types';
 import { AuthRoute } from 'src/auth/enums';
 
 dotenv.config();
@@ -25,8 +28,8 @@ export const transporter = nodemailer.createTransport({
 const MailGenerator = new Mailgen({
   theme: 'default',
   product: {
-    name: 'Mailgen',
-    link: 'https://mailgen.js/',
+    name: 'Vision car',
+    link: 'https://www.linkedin.com/in/ngimdock-zemfack/',
   },
 });
 
@@ -159,14 +162,56 @@ export const getEmailWhilePasswodResetedOptions = ({
     },
   };
 
-  console.log({ rrEmail: email });
-
   const welcomeEmailTemplate = MailGenerator.generate(template);
 
   return {
     from: COMPANY_EMAIL,
     to: email,
     subject: `Your password has been reset`,
+    html: welcomeEmailTemplate,
+  };
+};
+
+export const getOrderCreatedEmailOptions = (
+  { email }: ReceiverEmailData,
+  carOrderedData: CarOrderedEmailData[],
+) => {
+  const template = {
+    body: {
+      intro:
+        'We are currently processing your order, after validation, our team will send you the delivery informations.',
+
+      table: {
+        data: carOrderedData.map((car) => ({
+          cars: car.brand,
+          quantity: car.quantity,
+          price: '$' + car.price * car.quantity,
+        })),
+
+        customWidth: {
+          item: '20%',
+          price: '15%',
+        },
+
+        customAlignment: {
+          price: 'right',
+        },
+      },
+
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const welcomeEmailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Your order has been created`,
     html: welcomeEmailTemplate,
   };
 };

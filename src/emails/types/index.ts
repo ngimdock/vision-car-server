@@ -1,3 +1,5 @@
+import { Car } from '@prisma/client';
+
 export interface EmailOptionsType {
   from: string;
   to: string;
@@ -10,4 +12,8 @@ export type ReceiverEmailData = {
   email: string;
   username?: string;
   token?: string;
+};
+
+export type CarOrderedEmailData = Pick<Car, 'brand' | 'price'> & {
+  quantity: number;
 };

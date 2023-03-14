@@ -7,7 +7,7 @@ import { EmailVerificationService } from './email-verification/email-verificatio
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 
 @Module({
-  imports: [EmailModule, forwardRef(() => UserModule)],
+  imports: [forwardRef(() => UserModule)],
   controllers: [AuthController],
   providers: [AuthService, EmailVerificationService, ForgotPasswordService],
   exports: [AuthService],

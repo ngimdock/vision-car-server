@@ -4,10 +4,11 @@ import {
   getEmailVerificationOptions,
   getEmailWelcomeOptions,
   getEmailWhilePasswodResetedOptions,
+  getOrderCreatedEmailOptions,
   transporter,
 } from './config';
 import { EmailService } from './email.service';
-import { ReceiverEmailData } from './types';
+import { CarOrderedEmailData, ReceiverEmailData } from './types';
 
 @Injectable()
 export class NodeMailerService implements EmailService {
@@ -45,5 +46,17 @@ export class NodeMailerService implements EmailService {
     const options = getEmailWhilePasswodResetedOptions(receiverEmailData);
 
     return transporter.sendMail(options);
+  }
+
+  async sendEmailWhileOrderCreated(
+    receiverEmailData: ReceiverEmailData,
+    carOrderedData: CarOrderedEmailData[],
+  ): Promise<void> {
+    const options = getOrderCreatedEmailOptions(
+      receiverEmailData,
+      carOrderedData,
+    );
+
+    await transporter.sendMail(options);
   }
 }

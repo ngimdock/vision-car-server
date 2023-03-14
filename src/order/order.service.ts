@@ -9,6 +9,8 @@ import {
   CreditCardNotFoundException,
   InsufficientBalanceException,
 } from 'src/credit-card/exceptions';
+import { EmailService } from 'src/emails/email.service';
+import { CarOrderedEmailData } from 'src/emails/types';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ShipperService } from 'src/user/shipper/shipper.service';
 import { UserService } from 'src/user/user.service';
@@ -23,6 +25,11 @@ import { ShipperNotAvailableException } from './exceptions/shipper-not-available
 import { OrderRepository } from './order.repository';
 import { CreateOrderData } from './types';
 
+export type OrderCreatedEmailData = Pick<
+  Awaited<ReturnType<UserService['findMe']>>,
+  'bookedCars'
+>['bookedCars'];
+
 @Injectable()
 export class OrderService {
   constructor(
@@ -32,10 +39,11 @@ export class OrderService {
     private readonly shipperService: ShipperService,
     private readonly creditCardService: CreditCardService,
     private readonly carService: CarService,
+    private readonly emailService: EmailService,
   ) {}
 
   async create(customerId: string, createOrderDto: CreateOrderDto) {
-    const { bookedCars, creditCards } = await this.userService.findMe(
+    const { bookedCars, creditCards, email } = await this.userService.findMe(
       customerId,
     );
 
@@ -48,8 +56,6 @@ export class OrderService {
     if (!bookedCars.length) throw new EmptyBookingsException();
 
     const bookingsAmount = this.computeBookingsAmount(bookedCars);
-
-    console.log({ bookingsAmount, balance: targetCreditCard.balance });
 
     if (bookingsAmount > targetCreditCard.balance)
       throw new InsufficientBalanceException();
@@ -72,6 +78,12 @@ export class OrderService {
       await this.carService.makeBookingsOrdered(
         bookingsToConnectData.map((b) => b.id),
       );
+
+      const emailData = this.formatOrderEmail(bookedCars);
+
+      console.log({ emailData });
+
+      await this.emailService.sendEmailWhileOrderCreated({ email }, emailData);
 
       return orderCreated;
     });
@@ -433,5 +445,15 @@ export class OrderService {
     });
 
     return foundShipper;
+  }
+
+  private formatOrderEmail(
+    bookingData: OrderCreatedEmailData,
+  ): CarOrderedEmailData[] {
+    return bookingData.map((booking) => ({
+      brand: booking.car.brand,
+      quantity: booking.quantity,
+      price: booking.car.price,
+    }));
   }
 }

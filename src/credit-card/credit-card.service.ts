@@ -29,6 +29,7 @@ export class CreditCardService {
 
       return createdCreditCard;
     } catch (err) {
+      console.log({ message: err.message });
       throw new CustomHttpExeption();
     }
   }

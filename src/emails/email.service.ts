@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ReceiverEmailData } from './types';
+import { CarOrderedEmailData, ReceiverEmailData } from './types';
 
 @Injectable()
 export abstract class EmailService {
@@ -17,5 +17,10 @@ export abstract class EmailService {
 
   abstract sendEmailWhilePasswordReseted(
     receiverEmailData: ReceiverEmailData,
+  ): Promise<void>;
+
+  abstract sendEmailWhileOrderCreated(
+    receiverEmailData: ReceiverEmailData,
+    carOrderedData: CarOrderedEmailData[],
   ): Promise<void>;
 }
