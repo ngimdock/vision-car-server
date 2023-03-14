@@ -79,11 +79,19 @@ export class OrderService {
         bookingsToConnectData.map((b) => b.id),
       );
 
-      const emailData = this.formatOrderEmail(bookedCars);
+      const clientEmailData = this.formatOrderEmail(bookedCars);
 
-      console.log({ emailData });
+      await Promise.all([
+        this.emailService.sendEmailWhileOrderCreated(
+          { email },
+          clientEmailData,
+        ),
 
-      await this.emailService.sendEmailWhileOrderCreated({ email }, emailData);
+        this.emailService.sendEmailToNotifyAdmin({
+          subject: 'New pending order',
+          message: 'A customer made a new order.',
+        }),
+      ]);
 
       return orderCreated;
     });

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CarOrderedEmailData, ReceiverEmailData } from './types';
+import {
+  CarOrderedEmailData,
+  NotifyAdminType,
+  ReceiverEmailData,
+} from './types';
 
 @Injectable()
 export abstract class EmailService {
@@ -22,5 +26,9 @@ export abstract class EmailService {
   abstract sendEmailWhileOrderCreated(
     receiverEmailData: ReceiverEmailData,
     carOrderedData: CarOrderedEmailData[],
+  ): Promise<void>;
+
+  abstract sendEmailToNotifyAdmin(
+    notifyAdminData: NotifyAdminType,
   ): Promise<void>;
 }

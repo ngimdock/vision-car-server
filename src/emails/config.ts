@@ -4,6 +4,7 @@ import * as Mailgen from 'mailgen';
 import {
   CarOrderedEmailData,
   EmailOptionsType,
+  NotifyAdminType,
   ReceiverEmailData,
 } from './types';
 import { AuthRoute } from 'src/auth/enums';
@@ -14,8 +15,12 @@ const COMPANY_NAME = process.env.COMPANY_NAME;
 const COMPANY_EMAIL = process.env.COMPANY_EMAIL;
 const COMPANY_EMAIL_PASSWORD = process.env.COMPANY_EMAIL_PASSWORD;
 
+const NGIMDOCK_LINKEDIN = process.env.NGIMDOCK_LINKEDIN;
+
 const SERVER_APP_HOST = process.env.SERVER_APP_HOST;
 const SERVER_APP_PORT = process.env.SERVER_APP_PORT;
+
+const CLIENT_APP_URL = process.env.CLIENT_APP_URL;
 
 export const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -28,8 +33,8 @@ export const transporter = nodemailer.createTransport({
 const MailGenerator = new Mailgen({
   theme: 'default',
   product: {
-    name: 'Vision car',
-    link: 'https://www.linkedin.com/in/ngimdock-zemfack/',
+    name: COMPANY_NAME,
+    link: NGIMDOCK_LINKEDIN,
   },
 });
 
@@ -213,5 +218,33 @@ export const getOrderCreatedEmailOptions = (
     to: email,
     subject: `Your order has been created`,
     html: welcomeEmailTemplate,
+  };
+};
+
+export const getNotifyAdminEmailOptions = ({
+  subject,
+  message,
+}: NotifyAdminType) => {
+  const template = {
+    body: {
+      intro: message,
+      action: {
+        instructions: `Consult your dashboard for more details`,
+        button: {
+          color: '#22BC66',
+          text: 'Your dashboard',
+          link: `${CLIENT_APP_URL}/admin/dashboard`,
+        },
+      },
+    },
+  };
+
+  const emailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: COMPANY_EMAIL,
+    subject: subject,
+    html: emailTemplate,
   };
 };

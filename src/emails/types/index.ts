@@ -17,3 +17,8 @@ export type ReceiverEmailData = {
 export type CarOrderedEmailData = Pick<Car, 'brand' | 'price'> & {
   quantity: number;
 };
+
+export interface NotifyAdminType {
+  subject: string;
+  message: string;
+}
