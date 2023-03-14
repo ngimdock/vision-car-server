@@ -5,7 +5,9 @@ import {
   CarOrderedEmailData,
   EmailOptionsType,
   NotifyAdminType,
+  NotifyShipperType,
   ReceiverEmailData,
+  ShipperEmailData,
 } from './types';
 import { AuthRoute } from 'src/auth/enums';
 
@@ -37,6 +39,17 @@ const MailGenerator = new Mailgen({
     link: NGIMDOCK_LINKEDIN,
   },
 });
+
+const EmailBodyTableConfig = {
+  customWidth: {
+    cars: '20%',
+    price: '15%',
+  },
+
+  customAlignment: {
+    price: 'right',
+  },
+};
 
 export const getEmailWelcomeOptions = ({
   email,
@@ -193,14 +206,9 @@ export const getOrderCreatedEmailOptions = (
           price: '$' + car.price * car.quantity,
         })),
 
-        customWidth: {
-          item: '20%',
-          price: '15%',
-        },
+        customWidth: EmailBodyTableConfig.customWidth,
 
-        customAlignment: {
-          price: 'right',
-        },
+        customAlignment: EmailBodyTableConfig.customAlignment,
       },
 
       outro: `Need help, or have questions? Just reply to this email, we'd love to help.
@@ -244,6 +252,88 @@ export const getNotifyAdminEmailOptions = ({
   return {
     from: COMPANY_EMAIL,
     to: COMPANY_EMAIL,
+    subject: subject,
+    html: emailTemplate,
+  };
+};
+
+export const getOrderValidatedEmailOptions = (
+  { email },
+  carOrderedData: CarOrderedEmailData[],
+  shipperData: ShipperEmailData,
+) => {
+  const template = {
+    body: {
+      intro: 'Your order has been validated ',
+
+      table: [
+        {
+          title: 'Shipper informations',
+          data: [
+            {
+              ShipperName: shipperData.name,
+              ShipperEmail: shipperData.email,
+            },
+          ],
+
+          customWidth: EmailBodyTableConfig.customWidth,
+
+          customAlignment: EmailBodyTableConfig.customAlignment,
+        },
+
+        {
+          title: 'Order informations',
+          data: carOrderedData.map((car) => ({
+            cars: car.brand,
+            quantity: car.quantity,
+            price: '$' + car.price * car.quantity,
+          })),
+
+          customWidth: EmailBodyTableConfig.customWidth,
+
+          customAlignment: EmailBodyTableConfig.customAlignment,
+        },
+      ],
+
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const welcomeEmailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Your order has been validated`,
+    html: welcomeEmailTemplate,
+  };
+};
+
+export const getNotifyShipperEmailOptions = ({
+  email,
+  subject,
+  message,
+}: NotifyShipperType) => {
+  const template = {
+    body: {
+      intro: message,
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const emailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
     subject: subject,
     html: emailTemplate,
   };

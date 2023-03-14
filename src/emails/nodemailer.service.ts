@@ -5,14 +5,18 @@ import {
   getEmailWelcomeOptions,
   getEmailWhilePasswodResetedOptions,
   getNotifyAdminEmailOptions,
+  getNotifyShipperEmailOptions,
   getOrderCreatedEmailOptions,
+  getOrderValidatedEmailOptions,
   transporter,
 } from './config';
 import { EmailService } from './email.service';
 import {
   CarOrderedEmailData,
   NotifyAdminType,
+  NotifyShipperType,
   ReceiverEmailData,
+  ShipperEmailData,
 } from './types';
 
 @Injectable()
@@ -69,6 +73,28 @@ export class NodeMailerService implements EmailService {
     notifyAdminData: NotifyAdminType,
   ): Promise<void> {
     const options = getNotifyAdminEmailOptions(notifyAdminData);
+
+    await transporter.sendMail(options);
+  }
+
+  sendEmailWhileOrderValidated(
+    receiverEmailData: ReceiverEmailData,
+    carOrderedData: CarOrderedEmailData[],
+    shipperdata: ShipperEmailData,
+  ): Promise<void> {
+    const options = getOrderValidatedEmailOptions(
+      receiverEmailData,
+      carOrderedData,
+      shipperdata,
+    );
+
+    return transporter.sendMail(options);
+  }
+
+  async sendEmailToNotifyShipper(
+    notifyShipper: NotifyShipperType,
+  ): Promise<void> {
+    const options = getNotifyShipperEmailOptions(notifyShipper);
 
     await transporter.sendMail(options);
   }

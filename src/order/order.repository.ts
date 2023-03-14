@@ -93,6 +93,12 @@ export class OrderRepository {
         validatedAt: true,
         totalPrice: true,
         status: true,
+        shipper: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
         documents: {
           select: {
             type: true,
@@ -100,6 +106,18 @@ export class OrderRepository {
             file: true,
           },
         },
+        bookingsToOrder: {
+          select: {
+            quantity: true,
+            car: {
+              select: {
+                brand: true,
+                price: true,
+              },
+            },
+          },
+        },
+        customer: { select: { email: true } },
       },
     });
 

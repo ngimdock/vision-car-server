@@ -25,10 +25,14 @@ import { ShipperNotAvailableException } from './exceptions/shipper-not-available
 import { OrderRepository } from './order.repository';
 import { CreateOrderData } from './types';
 
-export type OrderCreatedEmailData = Pick<
+type OrderCreatedEmailData = Pick<
   Awaited<ReturnType<UserService['findMe']>>,
   'bookedCars'
 >['bookedCars'];
+
+type OrderValidatedEmailData = Awaited<
+  ReturnType<OrderRepository['validateOrder']>
+>['bookingsToOrder'];
 
 @Injectable()
 export class OrderService {
@@ -62,41 +66,45 @@ export class OrderService {
 
     const bookingsToConnectData = this.getbookingsToConnectData(bookedCars);
 
-    const createdOrder = await this.prisma.$transaction(async () => {
-      await this.creditCardService.debitCreditCard(
-        customerId,
-        createOrderDto.creditCard,
-        { amount: bookingsAmount },
-      );
+    try {
+      const createdOrder = await this.prisma.$transaction(async () => {
+        await this.creditCardService.debitCreditCard(
+          customerId,
+          createOrderDto.creditCard,
+          { amount: bookingsAmount },
+        );
 
-      const orderCreated = await this.makeAndOrder(
-        customerId,
-        { ...createOrderDto, bookingsAmount },
-        bookingsToConnectData,
-      );
+        const orderCreated = await this.makeAndOrder(
+          customerId,
+          { ...createOrderDto, bookingsAmount },
+          bookingsToConnectData,
+        );
 
-      await this.carService.makeBookingsOrdered(
-        bookingsToConnectData.map((b) => b.id),
-      );
+        await this.carService.makeBookingsOrdered(
+          bookingsToConnectData.map((b) => b.id),
+        );
 
-      const clientEmailData = this.formatOrderEmail(bookedCars);
+        const clientEmailData = this.formatOrderEmail(bookedCars);
 
-      await Promise.all([
-        this.emailService.sendEmailWhileOrderCreated(
-          { email },
-          clientEmailData,
-        ),
+        await Promise.all([
+          this.emailService.sendEmailWhileOrderCreated(
+            { email },
+            clientEmailData,
+          ),
 
-        this.emailService.sendEmailToNotifyAdmin({
-          subject: 'New pending order',
-          message: 'A customer made a new order.',
-        }),
-      ]);
+          this.emailService.sendEmailToNotifyAdmin({
+            subject: 'New pending order',
+            message: 'A customer made a new order.',
+          }),
+        ]);
 
-      return orderCreated;
-    });
+        return orderCreated;
+      });
 
-    return createdOrder;
+      return createdOrder;
+    } catch (err) {
+      throw new CustomHttpExeption();
+    }
   }
 
   async findAll({ offset, limit }: PaginateDto): Promise<PaginateResultType> {
@@ -341,9 +349,28 @@ export class OrderService {
         validateOrderDto,
       );
 
+      const { customer, shipper, bookingsToOrder } = validatedOrder;
+
+      const formatedBookingData =
+        this.formatValidateOrderEmail(bookingsToOrder);
+
+      await Promise.all([
+        this.emailService.sendEmailWhileOrderValidated(
+          { email: customer.email },
+          formatedBookingData,
+          shipper,
+        ),
+
+        this.emailService.sendEmailToNotifyShipper({
+          email: shipper.email,
+          subject: 'New order to ship',
+          message:
+            'You have a new order to ship , visit your dashboard for more details.',
+        }),
+      ]);
+
       return validatedOrder;
     } catch (err) {
-      console.log({ e: err.message });
       throw new CustomHttpExeption();
     }
   }
@@ -434,8 +461,6 @@ export class OrderService {
   }
 
   private async isChipperAvailable(shipperId: string, contryName: string) {
-    console.log({ shipperId, contryName });
-
     const foundShipper = await this.prisma.user.findFirst({
       where: {
         id: shipperId,
@@ -457,6 +482,16 @@ export class OrderService {
 
   private formatOrderEmail(
     bookingData: OrderCreatedEmailData,
+  ): CarOrderedEmailData[] {
+    return bookingData.map((booking) => ({
+      brand: booking.car.brand,
+      quantity: booking.quantity,
+      price: booking.car.price,
+    }));
+  }
+
+  private formatValidateOrderEmail(
+    bookingData: OrderValidatedEmailData,
   ): CarOrderedEmailData[] {
     return bookingData.map((booking) => ({
       brand: booking.car.brand,
