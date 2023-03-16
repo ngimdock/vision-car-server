@@ -7,6 +7,7 @@ import {
   getNotifyAdminEmailOptions,
   getNotifyShipperEmailOptions,
   getOrderCreatedEmailOptions,
+  getOrderRejectedEmailOptions,
   getOrderValidatedEmailOptions,
   transporter,
 } from './config';
@@ -86,6 +87,18 @@ export class NodeMailerService implements EmailService {
       receiverEmailData,
       carOrderedData,
       shipperdata,
+    );
+
+    return transporter.sendMail(options);
+  }
+
+  sendEmailWhileOrderRejected(
+    receiverEmailData: ReceiverEmailData,
+    carOrderedData: CarOrderedEmailData[],
+  ): Promise<void> {
+    const options = getOrderRejectedEmailOptions(
+      receiverEmailData,
+      carOrderedData,
     );
 
     return transporter.sendMail(options);

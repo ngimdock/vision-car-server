@@ -279,19 +279,37 @@ export class OrderService {
       OrderStatus.PENDING,
     );
 
-    const { id, totalPrice, customerId, creditCardId, bookingsToOrder } =
-      foundOrder;
+    const {
+      id,
+      totalPrice,
+      customerId,
+      creditCardId,
+      bookingsToOrder,
+      customer,
+    } = foundOrder;
 
     const rejectedOrder = await this.prisma.$transaction(async () => {
-      const rejectedOrder = await this.orderRepository.rejectOrder(id);
+      const [rejectedOrder] = await Promise.all([
+        this.orderRepository.rejectOrder(id),
+        this.creditCardService.rechargeCreditCard(customerId, creditCardId, {
+          amount: totalPrice,
+        }),
+        this.carService.increaseCarsStocks(bookingsToOrder),
+      ]);
 
-      await this.creditCardService.rechargeCreditCard(
-        customerId,
-        creditCardId,
-        { amount: totalPrice },
+      const formatedBookingData = this.formatValidateOrderEmail(
+        rejectedOrder.bookingsToOrder,
       );
 
-      await this.carService.increaseCarsStocks(bookingsToOrder);
+      console.log({
+        email: customer.email,
+        formatedBookingData,
+      });
+
+      await this.emailService.sendEmailWhileOrderRejected(
+        { email: customer.email },
+        formatedBookingData,
+      );
 
       return rejectedOrder;
     });

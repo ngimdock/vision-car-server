@@ -25,6 +25,19 @@ export class OrderRepository {
     return this.prisma.order.update({
       where: { id: orderId },
       data: { status: OrderStatus.REJECTED },
+      include: {
+        bookingsToOrder: {
+          select: {
+            quantity: true,
+            car: {
+              select: {
+                brand: true,
+                price: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -56,6 +69,12 @@ export class OrderRepository {
           select: {
             carId: true,
             quantity: true,
+          },
+        },
+
+        customer: {
+          select: {
+            email: true,
           },
         },
       },

@@ -36,6 +36,11 @@ export abstract class EmailService {
     shipperdata: ShipperEmailData,
   ): Promise<void>;
 
+  abstract sendEmailWhileOrderRejected(
+    receiverEmailData: ReceiverEmailData,
+    carOrderedData: CarOrderedEmailData[],
+  ): Promise<void>;
+
   abstract sendEmailToNotifyAdmin(
     notifyAdminData: NotifyAdminType,
   ): Promise<void>;

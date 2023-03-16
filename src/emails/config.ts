@@ -313,6 +313,47 @@ export const getOrderValidatedEmailOptions = (
   };
 };
 
+export const getOrderRejectedEmailOptions = (
+  { email },
+  carOrderedData: CarOrderedEmailData[],
+) => {
+  const template = {
+    body: {
+      intro: 'Your order has been rejected ',
+
+      table: [
+        {
+          title: 'Order informations',
+          data: carOrderedData.map((car) => ({
+            cars: car.brand,
+            quantity: car.quantity,
+            price: '$' + car.price * car.quantity,
+          })),
+
+          customWidth: EmailBodyTableConfig.customWidth,
+
+          customAlignment: EmailBodyTableConfig.customAlignment,
+        },
+      ],
+
+      outro: `Need help, or have questions? Just reply to this email, we'd love to help.
+
+
+              ${COMPANY_NAME} Team.
+            `,
+    },
+  };
+
+  const emailTemplate = MailGenerator.generate(template);
+
+  return {
+    from: COMPANY_EMAIL,
+    to: email,
+    subject: `Your order has been rejected`,
+    html: emailTemplate,
+  };
+};
+
 export const getNotifyShipperEmailOptions = ({
   email,
   subject,
