@@ -8,12 +8,14 @@ import {
   Post,
   Session,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { PublicRoute } from './decorator';
 import { AuthDto, EmailDto, ResetPasswordDto } from './dto';
 import { AuthRoute } from './enums';
 import { UserSession, UserSessionData } from './types';
 
+@ApiTags(AuthRoute.auth)
 @Controller(AuthRoute.auth)
 export class AuthController {
   private static readonly token = 'token';

@@ -1,6 +1,7 @@
-import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
 import * as Mailgen from 'mailgen';
+import * as nodemailer from 'nodemailer';
+import { AuthRoute } from 'src/auth/enums';
 import {
   CarOrderedEmailData,
   EmailOptionsType,
@@ -9,7 +10,6 @@ import {
   ReceiverEmailData,
   ShipperEmailData,
 } from './types';
-import { AuthRoute } from 'src/auth/enums';
 
 dotenv.config();
 

@@ -1,10 +1,10 @@
+import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
+import * as path from 'path';
 import { extname } from 'path';
 import { getUUID } from 'src/common/helpers';
 import { CustomRequest } from 'src/common/types';
-import * as path from 'path';
 import { UPLOADED } from './constants';
-import { BadRequestException } from '@nestjs/common';
 import { carImagesEnum } from './enums';
 
 export const getFilename = (req, file, cb) => {

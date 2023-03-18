@@ -1,10 +1,11 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import * as session from 'express-session';
 import { ConfigService } from '@nestjs/config';
-import { createClient } from 'redis';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as connectRedis from 'connect-redis';
+import * as session from 'express-session';
+import { createClient } from 'redis';
+import { AppModule } from './app.module';
 import {
   TimeoutInterceptor,
   WrapResponseInterceptor,
@@ -57,6 +58,14 @@ async function bootstrap() {
     .catch((err) => {
       throw err;
     });
+
+  const config = new DocumentBuilder()
+    .setTitle('Vision-car')
+    .setDescription('And e-commerce API for selling cars.')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
 
   await app.listen(3333);
 }

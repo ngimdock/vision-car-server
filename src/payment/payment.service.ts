@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CarService } from 'src/car/car.service';
 import { CustomHttpExeption } from 'src/common/exceptions';
+import Stripe from 'stripe';
 import { CheckoutSessionDto, ProductToBuy } from './dto';
 import { EmptyProductException } from './exception';
-import Stripe from 'stripe';
 
 type CarType = Awaited<ReturnType<CarService['findManyByIds']>>;
 

@@ -1,20 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   ParseUUIDPipe,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { OrderService } from './order.service';
-import { OrderRoute } from './enum';
-import { GetUserId, Roles } from 'src/auth/decorator';
-import { CreateOrderDto, ShipOrderDto, ValidateOrderDto } from './dto';
-import { PaginateDto } from 'src/common/dto';
 import { Role } from '@prisma/client';
+import { GetUserId, Roles } from 'src/auth/decorator';
+import { PaginateDto } from 'src/common/dto';
+import { CreateOrderDto, ShipOrderDto, ValidateOrderDto } from './dto';
+import { OrderRoute } from './enum';
+import { OrderService } from './order.service';
 
 @Controller(OrderRoute.orders)
 export class OrderController {

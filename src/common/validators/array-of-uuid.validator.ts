@@ -1,8 +1,8 @@
 import {
+  registerDecorator,
+  ValidationArguments,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  ValidationArguments,
-  registerDecorator,
 } from 'class-validator';
 import { v4 as uuidv4 } from 'uuid';
 

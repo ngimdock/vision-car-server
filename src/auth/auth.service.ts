@@ -3,22 +3,22 @@ import {
   CredentialsIncorrectException,
   CustomHttpExeption,
 } from 'src/common/exceptions';
+import { EmailService } from 'src/emails/email.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto, ResetPasswordDto } from './dto';
+import { UserNotFoundException } from 'src/user/exceptions';
+import { CreateUserData } from 'src/user/type';
+import { UserService } from 'src/user/user.service';
 import { hashPassword, verifyPassword } from '../common/helpers';
-import { UserSession, UserSessionData } from './types';
-import { EmailVerificationService } from './email-verification/email-verification.service';
-import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { _15_MITUTES, _2_HOURS } from './constants';
+import { AuthDto, ResetPasswordDto } from './dto';
+import { EmailVerificationService } from './email-verification/email-verification.service';
 import {
   EmailAlreadyCertified,
   EmailSendRecentlyException,
   TokenExpiredException,
 } from './exceptions';
-import { UserNotFoundException } from 'src/user/exceptions';
-import { UserService } from 'src/user/user.service';
-import { CreateUserData } from 'src/user/type';
-import { EmailService } from 'src/emails/email.service';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
+import { UserSession, UserSessionData } from './types';
 
 @Injectable()
 export class AuthService {

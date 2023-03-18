@@ -42,7 +42,13 @@ yarn prisma:dev:studio
 
 That's all you need to do if you want to run the app.
 
-# Run the tests
+# Run units test
+
+```bash
+yarn test
+```
+
+# Run end to end tests
 
 ## Start the test db
 
