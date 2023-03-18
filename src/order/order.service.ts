@@ -34,6 +34,7 @@ type OrderValidatedEmailData = Awaited<
   ReturnType<OrderRepository['validateOrder']>
 >['bookingsToOrder'];
 
+type BookedCars = Awaited<ReturnType<UserService['findMe']>>['bookedCars'];
 @Injectable()
 export class OrderService {
   constructor(
@@ -301,11 +302,6 @@ export class OrderService {
         rejectedOrder.bookingsToOrder,
       );
 
-      console.log({
-        email: customer.email,
-        formatedBookingData,
-      });
-
       await this.emailService.sendEmailWhileOrderRejected(
         { email: customer.email },
         formatedBookingData,
@@ -414,7 +410,7 @@ export class OrderService {
     }
   }
 
-  private computeBookingsAmount(bookings: any[]): number {
+  private computeBookingsAmount(bookings: BookedCars) {
     const INITIAL_AMOUNT = 0;
 
     const bookingsAmount = bookings.reduce(

@@ -6,5 +6,9 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
-  "moduleDirectories": ["node_modules", "<rootDir>/../"]
+  "moduleDirectories": ["node_modules", "<rootDir>/../"],
+
+  "moduleNameMapper": {
+    "^src/(.*)": "<rootDir>/../src/$1"
+  }
 }
