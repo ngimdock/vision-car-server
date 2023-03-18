@@ -10,7 +10,16 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { PublicRoute } from './decorator';
+import {
+  PublicRoute,
+  SwaggerLoginDoc,
+  SwaggerLogoutDoc,
+  SwaggerRegisterDoc,
+  SwaggerResendEmailVerificationDoc,
+  SwaggerResetPasswordDoc,
+  SwaggerSendEmailToResetPasswordDoc,
+  SwaggerVerifyEmailDoc,
+} from './decorator';
 import { AuthDto, EmailDto, ResetPasswordDto } from './dto';
 import { AuthRoute } from './enums';
 import { UserSession, UserSessionData } from './types';
@@ -24,6 +33,7 @@ export class AuthController {
 
   @PublicRoute()
   @Post(AuthRoute.register)
+  @SwaggerRegisterDoc()
   async register(@Body() authDto: AuthDto, @Session() session: UserSession) {
     const userSessionData = await this.authService.register(authDto);
 
@@ -33,6 +43,7 @@ export class AuthController {
   @PublicRoute()
   @Post(AuthRoute.login)
   @HttpCode(HttpStatus.OK)
+  @SwaggerLoginDoc()
   async login(@Body() authDto: AuthDto, @Session() session: UserSession) {
     const userSessionData = await this.authService.login(authDto);
 
@@ -41,6 +52,7 @@ export class AuthController {
 
   @Post(AuthRoute.logout)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @SwaggerLogoutDoc()
   async logout(@Session() session: UserSession) {
     this.authService.destroySession(session);
   }
@@ -48,12 +60,14 @@ export class AuthController {
   @PublicRoute()
   @Post(AuthRoute.resendEmailVerification)
   @HttpCode(HttpStatus.OK)
+  @SwaggerResendEmailVerificationDoc()
   async resendEmailVerification(@Body() emailDto: EmailDto) {
     return this.authService.resendEmailVerification(emailDto.email);
   }
 
   @PublicRoute()
   @Get(`${AuthRoute.verifyEmail}/:${AuthController.token}`)
+  @SwaggerVerifyEmailDoc()
   async verifyEmail(@Param(AuthController.token) token: string) {
     return this.authService.verifyEmail(token);
   }
@@ -61,6 +75,7 @@ export class AuthController {
   @PublicRoute()
   @Post(AuthRoute.sendEmailToResetPassword)
   @HttpCode(HttpStatus.OK)
+  @SwaggerSendEmailToResetPasswordDoc()
   async sendEmailToResetPassword(@Body() emailDto: EmailDto) {
     return this.authService.sendEmailToResetPassword(emailDto.email);
   }
@@ -68,6 +83,7 @@ export class AuthController {
   @PublicRoute()
   @Post(`${AuthRoute.resetPassword}/:${AuthController.token}`)
   @HttpCode(HttpStatus.OK)
+  @SwaggerResetPasswordDoc()
   async resetPassword(
     @Param(AuthController.token) token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
@@ -77,7 +93,6 @@ export class AuthController {
   }
 
   /**@TODO */
-  @Post(AuthRoute.changeEmail)
   async changeEmail() {
     return { message: 'Email changed' };
   }
