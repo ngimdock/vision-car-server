@@ -1,16 +1,28 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsPositive, Max } from 'class-validator';
+import { MAX_CARS_TO_FETCH, MAX_OFFSET, MIN_OFFSET } from '../constants';
 export class PaginateDto {
   @IsNumber()
   @IsOptional()
-  @Max(1000)
+  @Max(MAX_OFFSET)
   @Type(() => Number)
-  readonly offset?: number = 0;
+  @ApiProperty({
+    default: MIN_OFFSET,
+    minimum: MIN_OFFSET,
+    maximum: MAX_OFFSET,
+  })
+  readonly offset?: number = MIN_OFFSET;
 
   @IsNumber()
   @IsPositive()
   @IsOptional()
-  @Max(20)
+  @Max(MAX_CARS_TO_FETCH)
   @Type(() => Number)
-  readonly limit?: number = 20;
+  @ApiProperty({
+    default: MAX_CARS_TO_FETCH,
+    minimum: 1,
+    maximum: MAX_CARS_TO_FETCH,
+  })
+  readonly limit?: number = MAX_CARS_TO_FETCH;
 }

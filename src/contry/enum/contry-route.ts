@@ -1,5 +1,5 @@
 export enum ContryRoute {
-  contrys = 'contrys',
+  contries = 'contries',
   all = 'all',
   create = 'create',
   update = 'update',

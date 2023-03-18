@@ -11,6 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { GetUserId, PublicRoute, Roles } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
@@ -21,7 +22,8 @@ import { UpdateContryDto } from './dto/update-contry.dto';
 import { ContryRoute } from './enum';
 
 @Roles(Role.ADMIN)
-@Controller(ContryRoute.contrys)
+@ApiTags(ContryRoute.contries)
+@Controller(ContryRoute.contries)
 export class ContryController {
   private static readonly contryId = 'contryId';
 

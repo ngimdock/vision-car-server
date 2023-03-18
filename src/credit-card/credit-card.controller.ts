@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GetUserId } from 'src/auth/decorator';
 import { CreditCardService } from './credit-card.service';
 import {
@@ -19,6 +20,7 @@ import {
 } from './dto';
 import { CreditCardRoutes } from './enum';
 
+@ApiTags(CreditCardRoutes.creditCards)
 @Controller(CreditCardRoutes.creditCards)
 export class CreditCardController {
   private static readonly creditCardId = 'creditCardId';

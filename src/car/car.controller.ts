@@ -11,6 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { GetUserId, Roles } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
@@ -18,6 +19,7 @@ import { CarService } from './car.service';
 import { BookACarDto, CreateCarDto, UpdateCarStockDto } from './dto';
 import { CarRoute } from './enums';
 
+@ApiTags(CarRoute.cars)
 @Controller(CarRoute.cars)
 export class CarController {
   private static readonly carId = 'carId';
