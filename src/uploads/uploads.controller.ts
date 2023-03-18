@@ -5,12 +5,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { UPLOADED } from './constants';
+import { SwaggerUploadFilesDoc } from './decorators';
 import { carDocumentsEnum, carImagesEnum, UploadRoute } from './enums';
 import { UploadsService } from './uploads.service';
 import { filesTypesFilter, getFilename } from './uploads.utils';
 
+@ApiTags(UploadRoute.uploads)
 @Controller(UploadRoute.uploads)
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
@@ -25,6 +28,7 @@ export class UploadsController {
       }),
     }),
   )
+  @SwaggerUploadFilesDoc()
   uploadCarsImages(@UploadedFiles() carImages: Array<Express.Multer.File>) {
     return this.uploadsService.formatFiles(carImages);
   }
@@ -43,6 +47,7 @@ export class UploadsController {
       },
     ),
   )
+  @SwaggerUploadFilesDoc()
   uploadCarsDocumensts(
     @UploadedFiles() carDocuments: Array<Express.Multer.File>,
   ) {
