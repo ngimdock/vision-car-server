@@ -40,7 +40,11 @@ yarn start:dev
 yarn prisma:dev:studio
 ```
 
-That's all you need to do if you want to run the app.
+## View the openIA documentation
+
+```bash
+http://localhost:3333/swagger
+```
 
 # Run units test
 

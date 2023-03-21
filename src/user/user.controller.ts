@@ -9,6 +9,7 @@ import {
   Patch,
   Session,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { AuthService } from 'src/auth/auth.service';
 import { GetUserId, Roles } from 'src/auth/decorator';
@@ -17,6 +18,7 @@ import { UpdateUserDto } from './dto';
 import { UserRoutes } from './enums';
 import { UserService } from './user.service';
 
+@ApiTags(UserRoutes.users)
 @Controller(UserRoutes.users)
 export class UserController {
   private static readonly userId = 'userId';
