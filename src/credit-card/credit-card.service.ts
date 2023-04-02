@@ -42,13 +42,17 @@ export class CreditCardService {
     });
   }
 
-  findOne(userId: string, creditCardId: string) {
-    return this.prisma.creditCard.findFirst({
+  async findOne(userId: string, creditCardId: string) {
+    const creditCard = await this.prisma.creditCard.findFirst({
       where: {
         id: creditCardId,
         userId,
       },
     });
+
+    if (!creditCard) throw new CreditCardNotFoundException();
+
+    return creditCard;
   }
 
   async update(
@@ -56,9 +60,7 @@ export class CreditCardService {
     creditCardId: string,
     updateCreditCardDto: UpdateCreditCardDto,
   ) {
-    const foundCreditCard = await this.findOne(userId, creditCardId);
-
-    if (!foundCreditCard) throw new CreditCardNotFoundException();
+    await this.findOne(userId, creditCardId);
 
     return this.prisma.creditCard.update({
       where: {
@@ -71,9 +73,7 @@ export class CreditCardService {
   }
 
   async remove(userId: string, creditCardId: string) {
-    const foundCreditCard = await this.findOne(userId, creditCardId);
-
-    if (!foundCreditCard) throw new CreditCardNotFoundException();
+    await this.findOne(userId, creditCardId);
 
     return this.prisma.creditCard.delete({
       where: {
@@ -87,9 +87,7 @@ export class CreditCardService {
     creditCardId: string,
     { amount }: BalanceHandlerCreditCardDto,
   ) {
-    const foundCreditCard = await this.findOne(userId, creditCardId);
-
-    if (!foundCreditCard) throw new CreditCardNotFoundException();
+    await this.findOne(userId, creditCardId);
 
     return this.prisma.creditCard.update({
       where: {
@@ -110,8 +108,6 @@ export class CreditCardService {
     { amount: amountToDebit }: BalanceHandlerCreditCardDto,
   ) {
     const foundCreditCard = await this.findOne(userId, creditCardId);
-
-    if (!foundCreditCard) throw new CreditCardNotFoundException();
 
     if (amountToDebit > foundCreditCard.balance)
       throw new InsufficientBalanceException();

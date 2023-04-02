@@ -31,6 +31,8 @@ export class ContryService {
     contryId: string,
     addShipmentContryDto: AddShipmentContryDto,
   ) {
+    await this.findOne(contryId);
+
     const foundedContry = await this.prisma.userShipToContry.findUnique({
       where: {
         userId_contryId: {

@@ -103,6 +103,8 @@ export class CarService {
   }
 
   async saveACar(userId: string, carId: string) {
+    await this.findOneById(carId);
+
     try {
       await this.carRepository.saveACar(userId, carId);
     } catch (e) {
@@ -111,6 +113,8 @@ export class CarService {
   }
 
   async unSaveACar(userId: string, carId: string) {
+    await this.findOneById(carId);
+
     try {
       await this.carRepository.unsaveACar(userId, carId);
     } catch (e) {
@@ -248,6 +252,8 @@ export class CarService {
   }
 
   async decreaseCarStocks(carId: string, quantity: number) {
+    await this.findOneById(carId);
+
     try {
       const carWithStockDecreased = await this.prisma.car.update({
         where: {
@@ -266,6 +272,8 @@ export class CarService {
   }
 
   async increaseCarStocks(carId: string, quantity: number) {
+    await this.findOneById(carId);
+
     try {
       const carWithStockIncreased = await this.prisma.car.update({
         where: {

@@ -21,7 +21,7 @@ export class ShipperController {
   constructor(private readonly shipperService: ShipperService) {}
 
   @Roles(Role.ADMIN)
-  @Get(ShipperRoute.all)
+  @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheKey(ShipperRoute.shippers)
   @CacheTTL(TWO_MINUTE)

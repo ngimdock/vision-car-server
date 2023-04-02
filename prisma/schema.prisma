@@ -89,7 +89,7 @@ model UserBookCar {
 
 model CreditCard {
   id     String @id @default(uuid())
-  number Int @unique
+  number String @unique
   name   String
   cvc    Int
   expiry String

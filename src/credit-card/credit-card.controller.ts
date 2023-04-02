@@ -23,11 +23,11 @@ import { CreditCardRoutes } from './enum';
 @ApiTags(CreditCardRoutes.creditCards)
 @Controller(CreditCardRoutes.creditCards)
 export class CreditCardController {
-  private static readonly creditCardId = 'creditCardId';
+  private static readonly id = 'id';
 
   constructor(private readonly creditCardService: CreditCardService) {}
 
-  @Post(CreditCardRoutes.create)
+  @Post()
   create(
     @GetUserId() userId: string,
     @Body() createCreditCardDto: CreateCreditCardDto,
@@ -40,19 +40,19 @@ export class CreditCardController {
     return this.creditCardService.findAll(userId);
   }
 
-  @Get(`:${CreditCardController.creditCardId}`)
+  @Get(`:${CreditCardController.id}`)
   findOne(
     @GetUserId() userId: string,
-    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    @Param(CreditCardController.id, ParseUUIDPipe)
     creditCardId: string,
   ) {
     return this.creditCardService.findOne(userId, creditCardId);
   }
 
-  @Patch(`${CreditCardRoutes.update}/:${CreditCardController.creditCardId}`)
+  @Patch(`:${CreditCardController.id}`)
   update(
     @GetUserId() userId: string,
-    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    @Param(CreditCardController.id, ParseUUIDPipe)
     creditCardId: string,
     @Body() updateCreditCardDto: UpdateCreditCardDto,
   ) {
@@ -63,20 +63,20 @@ export class CreditCardController {
     );
   }
 
-  @Delete(`${CreditCardRoutes.delete}/:${CreditCardController.creditCardId}`)
+  @Delete(`:${CreditCardController.id}`)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(
     @GetUserId() userId: string,
-    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    @Param(CreditCardController.id, ParseUUIDPipe)
     creditCardId: string,
   ) {
     return this.creditCardService.remove(userId, creditCardId);
   }
 
-  @Patch(`${CreditCardRoutes.recharge}/:${CreditCardController.creditCardId}`)
+  @Patch(`${CreditCardRoutes.recharge}/:${CreditCardController.id}`)
   rechargeCreditCard(
     @GetUserId() userId: string,
-    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    @Param(CreditCardController.id, ParseUUIDPipe)
     creditCardId: string,
     @Body() balanceHandlerCreditCardDto: BalanceHandlerCreditCardDto,
   ) {
@@ -87,10 +87,10 @@ export class CreditCardController {
     );
   }
 
-  @Patch(`${CreditCardRoutes.debit}/:${CreditCardController.creditCardId}`)
+  @Patch(`${CreditCardRoutes.debit}/:${CreditCardController.id}`)
   debitCreditCard(
     @GetUserId() userId: string,
-    @Param(CreditCardController.creditCardId, ParseUUIDPipe)
+    @Param(CreditCardController.id, ParseUUIDPipe)
     creditCardId: string,
     @Body() balanceHandlerCreditCardDto: BalanceHandlerCreditCardDto,
   ) {

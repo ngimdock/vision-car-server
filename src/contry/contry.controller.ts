@@ -22,19 +22,19 @@ import { UpdateContryDto } from './dto/update-contry.dto';
 import { ContryRoute } from './enum';
 
 @Roles(Role.ADMIN)
-@ApiTags(ContryRoute.contries)
-@Controller(ContryRoute.contries)
+@ApiTags(ContryRoute.countries)
+@Controller(ContryRoute.countries)
 export class ContryController {
-  private static readonly contryId = 'contryId';
+  private static readonly id = 'id';
 
   constructor(private readonly contryService: ContryService) {}
 
   @Roles(Role.SHIPPER)
-  @Post(`${ContryRoute.addShipmentContry}/:${ContryController.contryId}`)
+  @Post(`${ContryRoute.addShipmentContry}/:${ContryController.id}`)
   @HttpCode(HttpStatus.OK)
   addUserShipmentContry(
     @GetUserId() shipperId: string,
-    @Param(ContryController.contryId, ParseUUIDPipe) contryId: string,
+    @Param(ContryController.id, ParseUUIDPipe) contryId: string,
     @Body() addShipmentContryDto: AddShipmentContryDto,
   ) {
     return this.contryService.addUserShipmentContry(
@@ -45,41 +45,41 @@ export class ContryController {
   }
 
   @Roles(Role.SHIPPER)
-  @Post(`${ContryRoute.removeShipmentContry}/:${ContryController.contryId}`)
+  @Post(`${ContryRoute.removeShipmentContry}/:${ContryController.id}`)
   @HttpCode(HttpStatus.OK)
   removeUserShipmentContry(
     @GetUserId() shipperId: string,
-    @Param(ContryController.contryId, ParseUUIDPipe) contryId: string,
+    @Param(ContryController.id, ParseUUIDPipe) contryId: string,
   ) {
     return this.contryService.removeUserShipmentContry(shipperId, contryId);
   }
 
-  @Post(ContryRoute.create)
+  @Post()
   create(@Body() createContryDto: CreateContryDto) {
     return this.contryService.create(createContryDto);
   }
 
   @PublicRoute()
-  @Get(ContryRoute.all)
+  @Get()
   findAll(@Query() paginate: PaginateDto) {
     return this.contryService.findAll(paginate);
   }
 
-  @Get(`:${ContryController.contryId}`)
-  findOne(@Param(ContryController.contryId) contryId: string) {
+  @Get(`:${ContryController.id}`)
+  findOne(@Param(ContryController.id) contryId: string) {
     return this.contryService.findOne(contryId);
   }
 
-  @Patch(`${ContryRoute.update}/:${ContryController.contryId}`)
+  @Patch(`:${ContryController.id}`)
   update(
-    @Param(ContryController.contryId) contryId: string,
+    @Param(ContryController.id) contryId: string,
     @Body() updateContryDto: UpdateContryDto,
   ) {
     return this.contryService.update(contryId, updateContryDto);
   }
 
-  @Delete(`${ContryRoute.delete}/:${ContryController.contryId}`)
-  delete(@Param(ContryController.contryId) contryId: string) {
+  @Delete(`:${ContryController.id}`)
+  delete(@Param(ContryController.id) contryId: string) {
     return this.contryService.delete(contryId);
   }
 }

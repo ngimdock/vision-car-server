@@ -22,32 +22,32 @@ import { CarRoute } from './enums';
 @ApiTags(CarRoute.cars)
 @Controller(CarRoute.cars)
 export class CarController {
-  private static readonly carId = 'carId';
+  private static readonly id = 'id';
   private static readonly bookingId = 'bookingId';
   private static readonly carImages = 'carImages';
 
   constructor(private readonly carService: CarService) {}
 
   @Roles(Role.ADMIN)
-  @Post(CarRoute.create)
+  @Post()
   create(@GetUserId() adminId: string, @Body() createCarDto: CreateCarDto) {
     return this.carService.create(adminId, createCarDto);
   }
 
-  @Get(CarRoute.all)
+  @Get()
   findAll(@Query() paginate: PaginateDto) {
     return this.carService.findAll(paginate);
   }
 
-  @Get(`${CarRoute.details}/:${CarController.carId}`)
-  findOneById(@Param(CarController.carId) cardId: string) {
+  @Get(`:${CarController.id}`)
+  findOneById(@Param(CarController.id) cardId: string) {
     return this.carService.findOneById(cardId);
   }
 
   @Roles(Role.ADMIN)
-  @Delete(`${CarRoute.delete}/:${CarController.carId}`)
+  @Delete(`:${CarController.id}`)
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteOne(@Param(`${CarController.carId}`) carId: string) {
+  deleteOne(@Param(`${CarController.id}`) carId: string) {
     return this.carService.deleteOne(carId);
   }
 
@@ -63,37 +63,37 @@ export class CarController {
     return this.carService.unBookACar(bookingId);
   }
 
-  @Post(`${CarRoute.save}/:${CarController.carId}`)
+  @Post(`${CarRoute.save}/:${CarController.id}`)
   @HttpCode(HttpStatus.OK)
   saveACar(
     @GetUserId() userId: string,
-    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Param(CarController.id, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.saveACar(userId, carId);
   }
 
-  @Post(`${CarRoute.unSave}/:${CarController.carId}`)
+  @Post(`${CarRoute.unSave}/:${CarController.id}`)
   @HttpCode(HttpStatus.OK)
   unSaveACar(
     @GetUserId() userId: string,
-    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Param(CarController.id, ParseUUIDPipe) carId: string,
   ) {
     return this.carService.unSaveACar(userId, carId);
   }
 
   @Roles(Role.ADMIN)
-  @Patch(`${CarRoute.increaseStock}/:${CarController.carId}`)
+  @Patch(`${CarRoute.increaseStock}/:${CarController.id}`)
   increaseCarStocks(
-    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Param(CarController.id, ParseUUIDPipe) carId: string,
     @Body() updateCarDto: UpdateCarStockDto,
   ) {
     return this.carService.increaseCarStocks(carId, updateCarDto.quantity);
   }
 
   @Roles(Role.ADMIN)
-  @Patch(`${CarRoute.decreaseStock}/:${CarController.carId}`)
+  @Patch(`${CarRoute.decreaseStock}/:${CarController.id}`)
   decreaseCarStocks(
-    @Param(CarController.carId, ParseUUIDPipe) carId: string,
+    @Param(CarController.id, ParseUUIDPipe) carId: string,
     @Body() updateCarDto: UpdateCarStockDto,
   ) {
     return this.carService.decreaseCarStocks(carId, updateCarDto.quantity);

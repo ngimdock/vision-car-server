@@ -8,11 +8,10 @@ import {
 } from 'class-validator';
 
 export class CreateCreditCardDto {
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @IsPositive()
   @ApiProperty({ description: 'The credit card number' })
-  readonly number: number;
+  readonly number: string;
 
   @IsString()
   @IsNotEmpty()
