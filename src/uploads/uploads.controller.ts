@@ -12,13 +12,14 @@ import { SwaggerUploadFilesDoc } from './decorators';
 import { carDocumentsEnum, carImagesEnum, UploadRoute } from './enums';
 import { UploadsService } from './uploads.service';
 import { filesTypesFilter, getFilename } from './uploads.utils';
+import { CarRoute } from 'src/car/enums';
 
 @ApiTags(UploadRoute.uploads)
 @Controller(UploadRoute.uploads)
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
-  @Post(UploadRoute.carImages)
+  @Post(`${CarRoute.cars}/${UploadRoute.images}`)
   @UseInterceptors(
     FilesInterceptor(carImagesEnum.uploadInputName, carImagesEnum.maxImages, {
       fileFilter: filesTypesFilter(carImagesEnum.extensions),
@@ -33,7 +34,7 @@ export class UploadsController {
     return this.uploadsService.formatFiles(carImages);
   }
 
-  @Post(UploadRoute.carDocuments)
+  @Post(`${CarRoute.cars}/${UploadRoute.documents}`)
   @UseInterceptors(
     FilesInterceptor(
       carDocumentsEnum.uploadInputName,
