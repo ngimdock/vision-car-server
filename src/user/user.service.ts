@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto';
 import { UserNotFoundException } from './exceptions';
@@ -104,10 +104,20 @@ export class UserService {
   }
 
   async update(userId: string, updateUserDto: UpdateUserDto) {
-    const { username, name, avatar } = updateUserDto;
+    const { username, name } = updateUserDto;
 
-    if (username) {
-      const usernameAlreadyTaken = await this.findOneUserByUsername(username);
+    const usernameTrimed = username.trim();
+
+    const userDataToUpdate: Partial<User> = {
+      ...updateUserDto,
+      username: usernameTrimed,
+      name: name.trim(),
+    };
+
+    if (usernameTrimed) {
+      const usernameAlreadyTaken = await this.findOneUserByUsername(
+        usernameTrimed,
+      );
 
       if (usernameAlreadyTaken)
         throw new BadRequestException('Username already taken.');
@@ -117,11 +127,7 @@ export class UserService {
       where: {
         id: userId,
       },
-      data: {
-        username,
-        name,
-        avatar,
-      },
+      data: userDataToUpdate,
     });
 
     return updatedUser;

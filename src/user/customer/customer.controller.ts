@@ -21,7 +21,7 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Roles(Role.ADMIN)
-  @Get(CustomerRoute.all)
+  @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheKey(CustomerRoute.customers)
   @CacheTTL(TWO_MINUTE)

@@ -21,7 +21,7 @@ import { UserService } from './user.service';
 @ApiTags(UserRoutes.users)
 @Controller(UserRoutes.users)
 export class UserController {
-  private static readonly userId = 'userId';
+  private static readonly id = 'id';
 
   constructor(
     private readonly userService: UserService,
@@ -33,14 +33,12 @@ export class UserController {
     return this.userService.findMe(userId);
   }
 
-  @Patch(UserRoutes.update)
+  @Patch()
   update(@GetUserId() userId: string, @Body() updateUserDto: UpdateUserDto) {
-    console.log({ updateUserDto });
-
     return this.userService.update(userId, updateUserDto);
   }
 
-  @Delete(UserRoutes.delete)
+  @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(
     @GetUserId() userId: string,
@@ -52,8 +50,8 @@ export class UserController {
   }
 
   @Roles(Role.ADMIN)
-  @Get(`:${UserController.userId}`)
-  findOneUserById(@Param(UserController.userId) userId: string) {
+  @Get(`:${UserController.id}`)
+  findOneUserById(@Param(UserController.id) userId: string) {
     return this.userService.findOneUserById(userId);
   }
 }
