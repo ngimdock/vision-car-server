@@ -16,6 +16,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { UserModule } from './user/user.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { UserModule } from './user/user.module';
     EmailModule,
     PaymentModule,
     AuthModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

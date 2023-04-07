@@ -16,73 +16,74 @@ import { PaginateDto } from 'src/common/dto';
 import { CreateOrderDto, ShipOrderDto, ValidateOrderDto } from './dto';
 import { OrderRoute } from './enum';
 import { OrderService } from './order.service';
+import { CustomerRoute } from 'src/user/customer/enums';
 
 @ApiTags(OrderRoute.orders)
 @Controller(OrderRoute.orders)
 export class OrderController {
-  private static readonly orderId = 'orderId';
+  private static readonly id = 'id';
   private static readonly customerId = 'customerId';
 
   constructor(private readonly orderService: OrderService) {}
 
-  @Post(`${OrderRoute.create}`)
+  @Post()
   create(@GetUserId() userId: string, @Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(userId, createOrderDto);
   }
 
   @Roles(Role.ADMIN)
-  @Get(`${OrderRoute.all}`)
+  @Get()
   findAll(@Query() paginate: PaginateDto) {
     return this.orderService.findAll(paginate);
   }
 
-  @Get(`:${OrderController.customerId}`)
+  @Get(`${CustomerRoute.customers}/:${OrderController.id}`)
   findCustomerOrders(
-    @Param(OrderController.customerId, ParseUUIDPipe) customerId: string,
+    @Param(OrderController.id, ParseUUIDPipe) customerId: string,
   ) {
     return this.orderService.findCustomerOrders(customerId);
   }
 
-  @Get(`${OrderRoute.find}/:${OrderController.orderId}`)
-  findOne(@Param(OrderController.orderId) orderId: string) {
+  @Get(`:${OrderController.id}`)
+  findOne(@Param(OrderController.id) orderId: string) {
     return this.orderService.findOneById(orderId);
   }
 
-  @Delete(`${OrderRoute.delete}/:${OrderController.orderId}`)
-  remove(@Param(OrderController.orderId) orderId: string) {
+  @Delete(`:${OrderController.id}`)
+  remove(@Param(OrderController.id) orderId: string) {
     return this.orderService.remove(orderId);
   }
 
-  @Patch(`${OrderRoute.cancel}/:${OrderController.orderId}`)
-  cancelOrder(@Param(OrderController.orderId) orderId: string) {
+  @Patch(`${OrderRoute.cancel}/:${OrderController.id}`)
+  cancelOrder(@Param(OrderController.id) orderId: string) {
     return this.orderService.cancelOrder(orderId);
   }
 
-  @Patch(`${OrderRoute.resubmit}/:${OrderController.orderId}`)
-  resubmitOrder(@Param(OrderController.orderId) orderId: string) {
+  @Patch(`${OrderRoute.resubmit}/:${OrderController.id}`)
+  resubmitOrder(@Param(OrderController.id) orderId: string) {
     return this.orderService.resubmitOrder(orderId);
   }
 
   @Roles(Role.ADMIN)
-  @Patch(`${OrderRoute.reject}/:${OrderController.orderId}`)
-  rejectOrder(@Param(OrderController.orderId) orderId: string) {
+  @Patch(`${OrderRoute.reject}/:${OrderController.id}`)
+  rejectOrder(@Param(OrderController.id) orderId: string) {
     return this.orderService.rejectOrder(orderId);
   }
 
   @Roles(Role.ADMIN)
-  @Patch(`${OrderRoute.validate}/:${OrderController.orderId}`)
+  @Patch(`${OrderRoute.validate}/:${OrderController.id}`)
   validateOrder(
-    @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,
+    @Param(OrderController.id, ParseUUIDPipe) orderId: string,
     @Body() validateOrderDto: ValidateOrderDto,
   ) {
     return this.orderService.validateOrder(orderId, validateOrderDto);
   }
 
   @Roles(Role.SHIPPER)
-  @Patch(`${OrderRoute.ship}/:${OrderController.orderId}`)
+  @Patch(`${OrderRoute.ship}/:${OrderController.id}`)
   shipOrder(
     @GetUserId() shipperId: string,
-    @Param(OrderController.orderId, ParseUUIDPipe) orderId: string,
+    @Param(OrderController.id, ParseUUIDPipe) orderId: string,
     @Body() shipOrderDto: ShipOrderDto,
   ) {
     return this.orderService.shipOrder(shipperId, orderId, shipOrderDto);
