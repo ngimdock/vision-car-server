@@ -4,6 +4,6 @@ import { ContryController } from './contry.controller';
 
 @Module({
   controllers: [ContryController],
-  providers: [ContryService]
+  providers: [ContryService],
 })
 export class ContryModule {}

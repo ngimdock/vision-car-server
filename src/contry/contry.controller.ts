@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -20,6 +21,9 @@ import { AddShipmentContryDto } from './dto';
 import { CreateContryDto } from './dto/create-contry.dto';
 import { UpdateContryDto } from './dto/update-contry.dto';
 import { ContryRoute } from './enum';
+import { EVENT_EMITTER } from 'src/events/constants';
+import { MyEmitter } from 'src/events/entities';
+import { events } from 'src/common/constants';
 
 @Roles(Role.ADMIN)
 @ApiTags(ContryRoute.countries)
@@ -27,7 +31,10 @@ import { ContryRoute } from './enum';
 export class ContryController {
   private static readonly id = 'id';
 
-  constructor(private readonly contryService: ContryService) {}
+  constructor(
+    private readonly contryService: ContryService,
+    @Inject(EVENT_EMITTER) private readonly event: MyEmitter,
+  ) {}
 
   @Roles(Role.SHIPPER)
   @Post(`${ContryRoute.addShipmentContry}/:${ContryController.id}`)
@@ -81,5 +88,11 @@ export class ContryController {
   @Delete(`:${ContryController.id}`)
   delete(@Param(ContryController.id) contryId: string) {
     return this.contryService.delete(contryId);
+  }
+
+  @PublicRoute()
+  @Post('test')
+  test(@Body() testBody: { name: string }) {
+    this.event.emit(events.USER_CREATED, testBody);
   }
 }

@@ -1,8 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import {
-  CredentialsIncorrectException,
-  CustomHttpExeption,
-} from 'src/common/exceptions';
+import { Inject, Injectable } from '@nestjs/common';
+import { CredentialsIncorrectException } from 'src/common/exceptions';
 import { EmailService } from 'src/emails/email.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserNotFoundException } from 'src/user/exceptions';
@@ -19,6 +16,9 @@ import {
 } from './exceptions';
 import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { UserSession, UserSessionData } from './types';
+import { EVENT_EMITTER } from 'src/events/constants';
+import { MyEmitter } from 'src/events/entities';
+import { events } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +28,7 @@ export class AuthService {
     private readonly emailVerificationService: EmailVerificationService,
     private readonly forgotPasswordService: ForgotPasswordService,
     private readonly emailService: EmailService,
+    @Inject(EVENT_EMITTER) private readonly eventEmitter: MyEmitter,
   ) {}
 
   async register({ email, password }: AuthDto): Promise<UserSessionData> {
@@ -39,22 +40,11 @@ export class AuthService {
 
     const createUserData: CreateUserData = { email, hash };
 
-    try {
-      const sessionData = await this.prisma.$transaction(async () => {
-        const [sessionData, { token }] = await Promise.all([
-          this.userService.create(createUserData),
-          this.emailVerificationService.create(email),
-        ]);
+    const sessionData = await this.userService.create(createUserData);
 
-        await this.emailService.sendEmailWelcome({ email, token });
+    this.eventEmitter.emit(events.USER_CREATED, { email });
 
-        return sessionData;
-      });
-
-      return sessionData;
-    } catch (err) {
-      throw new CustomHttpExeption();
-    }
+    return sessionData;
   }
 
   async login({ email, password }: AuthDto): Promise<UserSessionData> {
